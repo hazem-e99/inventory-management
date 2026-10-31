@@ -1,0 +1,23 @@
+{
+  "name": "inventory-management",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "postinstall": "node node_modules/electron/install.js",
+    "dev": "pnpm --filter @inv/desktop dev",
+    "build": "pnpm --filter @inv/desktop build",
+    "dist": "pnpm --filter @inv/desktop dist",
+    "typecheck": "pnpm -r typecheck",
+    "test": "vitest run",
+    "test:db": "vitest run --project db",
+    "test:e2e": "pnpm --filter @inv/desktop test:e2e"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  },
+  "type": "module"
+}

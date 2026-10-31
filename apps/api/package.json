@@ -1,0 +1,16 @@
+{
+  "name": "@inv/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc -p tsconfig.json" },
+  "dependencies": {
+    "@hono/node-server": "^2.1.5",
+    "@inv/contracts": "workspace:*",
+    "@inv/db": "workspace:*",
+    "hono": "^4.13.14",
+    "kysely": "^0.29.7"
+  },
+  "devDependencies": { "@types/node": "^24.0.0" }
+}

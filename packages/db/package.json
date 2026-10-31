@@ -1,0 +1,17 @@
+{
+  "name": "@inv/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc -p tsconfig.json" },
+  "dependencies": {
+    "better-sqlite3-multiple-ciphers": "^13.0.3",
+    "kysely": "^0.29.7"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.13",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^24.0.0"
+  }
+}

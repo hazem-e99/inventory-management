@@ -1,0 +1,18 @@
+import type { Kysely } from 'kysely'
+import { Migrator, type Migration } from 'kysely/migration'
+import * as settings from './migrations/0001_settings'
+import type { Database } from './schema'
+
+// Listed by hand so the bundled desktop build has no filesystem lookups.
+const migrations: Record<string, Migration> = {
+  '0001_settings': settings,
+}
+
+export async function migrateToLatest(db: Kysely<Database>): Promise<void> {
+  const migrator = new Migrator({
+    db,
+    provider: { getMigrations: async () => migrations },
+  })
+  const { error } = await migrator.migrateToLatest()
+  if (error) throw error
+}

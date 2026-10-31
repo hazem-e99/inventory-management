@@ -1,0 +1,16 @@
+node_modules/
+dist/
+out/
+release/
+.vite/
+coverage/
+*.log
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+*.db
+*.db-shm
+*.db-wal
+test-results/
+playwright-report/
