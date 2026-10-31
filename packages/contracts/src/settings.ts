@@ -72,6 +72,7 @@ export const settingsSchema = z.object({
   store: storeSchema,
   preferences: preferencesSchema,
   features: featuresSchema,
+  stockPolicy: z.object({ allowNegative: z.boolean() }),
 })
 
 export type Settings = z.infer<typeof settingsSchema>

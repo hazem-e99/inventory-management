@@ -8,6 +8,10 @@ export const PERMISSIONS = [
   'catalog.view',
   'catalog.manage',
   'catalog.import',
+  'stock.view',
+  'stock.manage',
+  'stock.void',
+  'stock.negative',
 ] as const
 
 export type Permission = (typeof PERMISSIONS)[number]

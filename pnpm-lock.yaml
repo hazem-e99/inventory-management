@@ -54,6 +54,9 @@ importers:
       '@types/node':
         specifier: ^24.0.0
         version: 24.19.2
+      fast-check:
+        specifier: ^4.3.0
+        version: 4.10.2
 
   apps/desktop:
     dependencies:
@@ -179,6 +182,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@inv/domain':
+        specifier: workspace:*
+        version: link:../domain
       better-sqlite3-multiple-ciphers:
         specifier: ^13.0.3
         version: 13.0.3
@@ -192,21 +198,25 @@ importers:
       '@electric-sql/pglite':
         specifier: ^0.5.13
         version: 0.5.14
-      '@inv/domain':
-        specifier: workspace:*
-        version: link:../domain
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
       '@types/node':
         specifier: ^24.0.0
         version: 24.19.2
+      fast-check:
+        specifier: ^4.3.0
+        version: 4.10.2
 
   packages/domain:
     dependencies:
       '@inv/contracts':
         specifier: workspace:*
         version: link:../contracts
+    devDependencies:
+      fast-check:
+        specifier: ^4.3.0
+        version: 4.10.2
 
   packages/i18n:
     dependencies:
@@ -2135,6 +2145,10 @@ packages:
   exponential-backoff@3.1.3:
     resolution: {integrity: sha512-ZgEeZXj30q+I0EN+CbSSpIyPaJ5HVQD18Z1m+u1FXbAeT94mr1zw50q4q6jiiC447Nl/YTcIYSAftiGqetwXCA==}
 
+  fast-check@4.10.2:
+    resolution: {integrity: sha512-iK2f+YrcmoeGqk6fA0ea2bptcu/itMIm4NfEozq6N25+aG6h7s5HZbB/k1aV7b5w5sFLMCbbtRUsTVR+BgC3xw==}
+    engines: {node: '>=12.17.0'}
+
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
@@ -2742,6 +2756,9 @@ packages:
 
   pump@3.0.4:
     resolution: {integrity: sha512-VS7sjc6KR7e1ukRFhQSY5LM2uBWAUPiOPa/A3mkKmiMwSmRFUITt0xuj+/lesgnCv+dPIEYlkzrcyXgquIHMcA==}
+
+  pure-rand@8.4.2:
+    resolution: {integrity: sha512-vvuOGgcuPJAirlHvuQw1TrOiw7ptaIXXmIbNuiNOY6lNGJJH49PQ1Kj4nd783nPdQhQdicgOjVI2yI/9BD6/Ng==}
 
   pvtsutils@1.3.6:
     resolution: {integrity: sha512-PLgQXQ6H2FWCaeRak8vvk1GW462lMxB5s3Jm673N82zI4vqtVUPuZdffdZbPDFRoU8kAhItWFtPCWiPpp4/EDg==}
@@ -5145,6 +5162,10 @@ snapshots:
 
   exponential-backoff@3.1.3: {}
 
+  fast-check@4.10.2:
+    dependencies:
+      pure-rand: 8.4.2
+
   fast-deep-equal@3.1.3: {}
 
   fast-uri@3.1.9: {}
@@ -5690,6 +5711,8 @@ snapshots:
     dependencies:
       end-of-stream: 1.4.5
       once: 1.4.0
+
+  pure-rand@8.4.2: {}
 
   pvtsutils@1.3.6:
     dependencies:

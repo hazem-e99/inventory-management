@@ -101,6 +101,10 @@
     "catalog": {
       "label": "Catalog setup",
       "other": "بيانات الأصناف"
+    },
+    "stock": {
+      "label": "Stock documents",
+      "other": "حركات المخزون"
     }
   },
   "account": {
@@ -269,7 +273,11 @@
     "backups.manage": "Manage backups",
     "catalog.view": "View items",
     "catalog.manage": "Manage items",
-    "catalog.import": "Import and export items"
+    "catalog.import": "Import and export items",
+    "stock.view": "View stock",
+    "stock.manage": "Adjust, transfer and count stock",
+    "stock.void": "Void stock documents",
+    "stock.negative": "Allow negative stock"
   },
   "audit": {
     "time": "Time",
@@ -303,7 +311,10 @@
       "product.archived": "Item archived",
       "product.restored": "Item restored",
       "catalog.imported": "Items imported",
-      "catalog.exported": "Items exported"
+      "catalog.exported": "Items exported",
+      "stock.posted": "Stock document posted",
+      "stock.voided": "Stock document voided",
+      "store.stock_policy_changed": "Stock policy changed"
     }
   },
   "backups": {
@@ -334,7 +345,10 @@
     "preferencesTitle": "Preferences",
     "businessType": "Business type",
     "businessLocked": "This decides how stock is recorded, so it stays fixed after setup.",
-    "currency": "Currency"
+    "currency": "Currency",
+    "stockTitle": "Stock policy",
+    "allowNegative": "Allow negative stock",
+    "allowNegativeHint": "Applies only to people with the negative stock permission. Best left off."
   },
   "pin": {
     "title": "Quick sign-in PIN",
@@ -407,7 +421,20 @@
     "IMPORT_COLUMNS_MISSING": "The file is missing a column: {{columns}}. Use the ready-made template.",
     "IMPORT_TOO_MANY_ROWS": "The file is over the limit ({{limit}}). Split it into smaller files.",
     "IMPORT_EMPTY": "The file has no items in it.",
-    "EXPORT_FAILED": "The file couldn't be saved. Check the location is writable and the file isn't open."
+    "EXPORT_FAILED": "The file couldn't be saved. Check the location is writable and the file isn't open.",
+    "QUANTITY_INVALID": "Enter a valid quantity above zero.",
+    "QUANTITY_NOT_WHOLE": "This unit doesn't allow fractions. Enter a whole number.",
+    "LOT_REQUIRED": "This item tracks batches. Enter the batch number.",
+    "EXPIRY_REQUIRED": "Enter the expiry date for this batch.",
+    "EXPIRY_INVALID": "That expiry date isn't valid.",
+    "LOT_EXPIRY_MISMATCH": "This batch is recorded with a different expiry date. Check the batch number or date.",
+    "LINE_DUPLICATED": "This item is repeated in the document. Remove one of the lines.",
+    "UNIT_CONVERSION_INVALID": "This unit isn't set up for this item.",
+    "SAME_WAREHOUSE": "The receiving warehouse must differ from the source.",
+    "STOCK_INSUFFICIENT": "Not enough {{item}}: {{requested}} needed, {{available}} available. Check the quantity, or record the stock first.",
+    "DOCUMENT_NOT_DRAFT": "This document is posted and can't be edited. To correct it, void it and create a new one.",
+    "DOCUMENT_NOT_POSTED": "Only a posted document can be voided.",
+    "DOCUMENT_EMPTY": "Add at least one item before posting."
   },
   "reference": {
     "tabs": {
@@ -415,7 +442,8 @@
       "brands": "Brands",
       "units": "Units",
       "tax-rates": "Taxes",
-      "price-lists": "Price lists"
+      "price-lists": "Price lists",
+      "warehouses": "Warehouses"
     },
     "name": "Name",
     "parent": "Parent category",
@@ -458,6 +486,9 @@
     "attributes": {
       "size": "Size",
       "color": "Color"
+    },
+    "warehouses": {
+      "main": "Main warehouse"
     }
   },
   "products": {
@@ -485,7 +516,9 @@
     "file": "Import and export",
     "import": "Import from file",
     "export": "Export items",
-    "exported": "File saved ({{count}} items)"
+    "exported": "File saved ({{count}} items)",
+    "onHand": "On hand",
+    "stock": "Stock and movements"
   },
   "import": {
     "title": "Import items",
@@ -531,5 +564,98 @@
     "showPrice": "Show price",
     "print": "Print",
     "currency": "EGP"
+  },
+  "stock": {
+    "newAdjustment": "New adjustment",
+    "newTransfer": "New transfer",
+    "newCount": "New count",
+    "allKinds": "All types",
+    "allStatuses": "All statuses",
+    "number": "Number",
+    "kind": "Type",
+    "status": "Status",
+    "warehouse": "Warehouse",
+    "lines": "Items",
+    "date": "Date",
+    "createdBy": "Created by",
+    "emptyTitle": "No stock documents",
+    "emptyBody": "Record your opening stock with an adjustment, or start a count.",
+    "kinds": {
+      "adjustment": "Adjustment",
+      "transfer": "Transfer",
+      "count": "Count"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "posted": "Posted",
+      "voided": "Voided"
+    },
+    "reasons": {
+      "opening": "Opening stock",
+      "correction": "Correction",
+      "damage": "Damaged",
+      "expired": "Expired",
+      "theft": "Lost or stolen",
+      "gift": "Gift or sample",
+      "other": "Other"
+    },
+    "newTitle": "New {{kind}}",
+    "fromWarehouse": "From warehouse",
+    "toWarehouse": "To warehouse",
+    "reason": "Reason",
+    "chooseReason": "Choose a reason",
+    "notes": "Notes",
+    "pick": "Search for an item or scan its barcode",
+    "noPick": "No matching item",
+    "item": "Item",
+    "unit": "Unit",
+    "quantity": "Quantity",
+    "counted": "Counted",
+    "expected": "On record",
+    "difference": "Difference",
+    "direction": "Direction",
+    "add": "Add",
+    "deduct": "Deduct",
+    "lot": "Batch",
+    "lotAuto": "Automatic (nearest expiry)",
+    "expiry": "Expiry",
+    "cost": "Cost",
+    "onHand": "On hand: {{value}}",
+    "removeLine": "Remove line",
+    "noLines": "Search for an item or scan its barcode to add it.",
+    "saveDraft": "Save draft",
+    "saved": "Draft saved",
+    "post": "Post document",
+    "postTitle": "Post this document?",
+    "postBody": "Stock changes straight away, and the document can't be edited once posted. You can void it later with a reversing entry.",
+    "posted": "Document posted",
+    "void": "Void document",
+    "voidTitle": "Void this document?",
+    "voidBody": "We record a reversing movement that puts stock back. The original stays in the history.",
+    "voided": "Document voided",
+    "deleteDraft": "Delete draft",
+    "deleteTitle": "Delete this draft?",
+    "deleteBody": "Stock isn't affected, because a draft hasn't been posted.",
+    "deleted": "Draft deleted",
+    "countTitle": "New stock count",
+    "countBody": "We list everything on record in this warehouse, and you enter what is actually there.",
+    "countCategory": "Category",
+    "countAll": "All categories",
+    "countStart": "Start count",
+    "countHint": "Only change the lines that differ. Lines you leave alone count as matching.",
+    "stopsLabel": "Document status",
+    "balancesTitle": "Current stock",
+    "value": "Value",
+    "averageCost": "Average cost",
+    "noStock": "This item has no stock.",
+    "movementsTitle": "Item movements",
+    "noMovements": "No movements recorded yet.",
+    "time": "Time",
+    "document": "Document",
+    "in": "In",
+    "out": "Out",
+    "reversal": "Reversal",
+    "user": "User",
+    "noLot": "No batch"
   }
 }

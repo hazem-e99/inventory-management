@@ -23,6 +23,7 @@
     "write-excel-file": "^4.1.1"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0"
+    "@types/node": "^24.0.0",
+    "fast-check": "^4.3.0"
   }
 }

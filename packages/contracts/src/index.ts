@@ -8,6 +8,7 @@ export * from './common'
 export * from './errors'
 export * from './permissions'
 export * from './settings'
+export * from './stock'
 export * from './users'
 
 export const healthSchema = z.object({

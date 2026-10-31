@@ -2,7 +2,7 @@ import type { Kysely } from 'kysely'
 import { newId } from './ids'
 import type { Database } from './schema'
 
-export type ReferenceTable = 'categories' | 'brands' | 'units' | 'tax_rates' | 'price_lists'
+export type ReferenceTable = 'categories' | 'brands' | 'units' | 'tax_rates' | 'price_lists' | 'warehouses'
 
 export interface ReferenceRow {
   id: string
@@ -30,6 +30,16 @@ async function usageCounts(db: Kysely<Database>, table: ReferenceTable): Promise
       .selectFrom('variant_prices')
       .select(['price_list_id as id', (eb) => eb.fn.count('variant_id').distinct().as('count')])
       .groupBy('price_list_id')
+      .execute()
+    return new Map(rows.map((row) => [row.id, Number(row.count)]))
+  }
+
+  if (table === 'warehouses') {
+    const rows = await db
+      .selectFrom('stock_balances')
+      .select(['warehouse_id as id', (eb) => eb.fn.count('variant_id').distinct().as('count')])
+      .where('qty_milli', '<>', 0)
+      .groupBy('warehouse_id')
       .execute()
     return new Map(rows.map((row) => [row.id, Number(row.count)]))
   }

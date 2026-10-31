@@ -150,8 +150,82 @@ export interface VariantPricesTable {
   amount_minor: number
 }
 
+export interface LotsTable {
+  id: string
+  variant_id: string
+  lot_no: string
+  expiry_date: string | null
+  created_at: number
+}
+
+export interface StockDocumentsTable {
+  id: string
+  kind: string
+  status: string
+  number: string | null
+  warehouse_id: string
+  to_warehouse_id: string | null
+  reason: string | null
+  notes: string | null
+  business_date: string | null
+  created_by: string | null
+  created_at: number
+  posted_at: number | null
+  voided_at: number | null
+}
+
+export interface StockDocumentLinesTable {
+  id: string
+  document_id: string
+  position: number
+  variant_id: string
+  unit_id: string
+  qty_milli: number
+  lot_id: string | null
+  lot_no: string | null
+  expiry_date: string | null
+  unit_cost_minor: number | null
+  expected_milli: number | null
+}
+
+export interface StockMovementsTable {
+  id: string
+  occurred_at: number
+  business_date: string
+  variant_id: string
+  warehouse_id: string
+  lot_id: string | null
+  qty_milli: number
+  value_minor: number
+  document_id: string
+  document_type: string
+  reversal_of: string | null
+  actor_id: string | null
+}
+
+export interface StockBalancesTable {
+  variant_id: string
+  warehouse_id: string
+  lot_key: string
+  lot_id: string | null
+  qty_milli: number
+}
+
+export interface VariantStockTable {
+  variant_id: string
+  qty_milli: number
+  value_minor: number
+}
+
 export interface Database {
   settings: SettingsTable
+  warehouses: NamedReferenceTable
+  lots: LotsTable
+  stock_documents: StockDocumentsTable
+  stock_document_lines: StockDocumentLinesTable
+  stock_movements: StockMovementsTable
+  stock_balances: StockBalancesTable
+  variant_stock: VariantStockTable
   document_sequences: DocumentSequencesTable
   categories: CategoriesTable
   brands: NamedReferenceTable

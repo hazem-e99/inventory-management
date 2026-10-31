@@ -64,6 +64,33 @@ export function Stops({ steps, current, 'aria-label': label }: StopsProps) {
   )
 }
 
+export interface StatusLineProps {
+  steps: ReactNode[]
+  current: number
+  'aria-label': string
+}
+
+/** A document's journey in one row: a stop for each state, the live one ringed. */
+export function StatusLine({ steps, current, 'aria-label': label }: StatusLineProps) {
+  return (
+    <ol aria-label={label} className="flex items-center">
+      {steps.map((step, index) => {
+        const active = index === current
+        const done = index < current
+        return (
+          <li key={index} aria-current={active ? 'step' : undefined} className="flex items-center">
+            {index > 0 && <span aria-hidden className={cn('h-0.5 w-10', done || active ? 'bg-route' : 'bg-rule-strong')} />}
+            <span className="flex items-center gap-2 px-2">
+              <Stop active={active} done={done} tone="surface" />
+              <span className={cn('text-sm', active ? 'font-semibold text-ink' : 'text-ink-faint')}>{step}</span>
+            </span>
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
 export interface StationLinkProps extends ComponentProps<'span'> {
   icon: ReactNode
   label: ReactNode

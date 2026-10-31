@@ -1,5 +1,5 @@
 import { createRoute } from '@hono/zod-openapi'
-import { preferencesSchema, settingsSchema, storeSchema, updateStoreSchema } from '@inv/contracts'
+import { preferencesSchema, settingsSchema, stockPolicySchema, storeSchema, updateStoreSchema } from '@inv/contracts'
 import { auditRepo } from '@inv/db'
 import type { AppDeps } from '../http/context'
 import { AppError } from '../http/errors'
@@ -33,13 +33,26 @@ export function settingsRoutes(deps: AppDeps) {
     responses: { 200: jsonOk(preferencesSchema) },
   })
 
+  const updateStockPolicyRoute = createRoute({
+    method: 'put',
+    path: '/settings/stock-policy',
+    middleware: [...guard, requirePermission('settings.manage')],
+    request: { body: jsonBody(stockPolicySchema) },
+    responses: { 200: jsonOk(stockPolicySchema) },
+  })
+
   return router()
     .openapi(readRoute, async (c) => {
       const settings = storeSettings(deps.db)
       const store = await settings.store()
       if (!store) throw new AppError('NOT_ONBOARDED')
       return c.json(
-        { store, preferences: await settings.preferences(), features: await settings.features() },
+        {
+          store,
+          preferences: await settings.preferences(),
+          features: await settings.features(),
+          stockPolicy: await settings.stockPolicy(),
+        },
         200,
       )
     })
@@ -68,6 +81,18 @@ export function settingsRoutes(deps: AppDeps) {
         return store
       })
       return c.json(updated, 200)
+    })
+    .openapi(updateStockPolicyRoute, async (c) => {
+      const policy = c.req.valid('json')
+      const now = deps.clock()
+      await storeSettings(deps.db).setStockPolicy(policy, now)
+      await auditRepo(deps.db).record({
+        actorId: c.get('actor').id,
+        action: 'store.stock_policy_changed',
+        details: policy,
+        occurredAt: now,
+      })
+      return c.json(policy, 200)
     })
     .openapi(updatePreferencesRoute, async (c) => {
       const preferences = c.req.valid('json')

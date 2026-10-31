@@ -23,6 +23,7 @@ const SYSTEM_GROUP: Partial<Record<ReferenceKind, string>> = {
   units: 'units',
   'tax-rates': 'taxes',
   'price-lists': 'priceLists',
+  warehouses: 'warehouses',
 }
 
 /** Built-in rows store an id, so their display name comes from the translations. */

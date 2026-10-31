@@ -40,6 +40,7 @@ export interface ProductListRow {
   barcode: string | null
   priceMinor: number | null
   variantCount: number
+  onHandMilli: number
   archived: boolean
 }
 
@@ -316,6 +317,12 @@ function productRows(db: Kysely<Database>) {
         .whereRef('counted.product_id', '=', 'products.id')
         .where('counted.archived_at', 'is', null)
         .as('variant_count'),
+      eb
+        .selectFrom('variant_stock')
+        .innerJoin('product_variants as owned', 'owned.id', 'variant_stock.variant_id')
+        .select((inner) => inner.fn.sum<number>('variant_stock.qty_milli').as('total'))
+        .whereRef('owned.product_id', '=', 'products.id')
+        .as('on_hand_milli'),
     ])
 }
 
@@ -332,6 +339,7 @@ function toListRow(row: RawListRow): ProductListRow {
     barcode: row.barcode,
     priceMinor: row.price_minor === null ? null : Number(row.price_minor),
     variantCount: Number(row.variant_count),
+    onHandMilli: Number(row.on_hand_milli ?? 0),
     archived: row.archived_at !== null,
   }
 }

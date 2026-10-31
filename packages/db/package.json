@@ -13,12 +13,13 @@
   "dependencies": {
     "better-sqlite3-multiple-ciphers": "^13.0.3",
     "kysely": "^0.29.7",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "@inv/domain": "workspace:*"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.13",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^24.0.0",
-    "@inv/domain": "workspace:*"
+    "fast-check": "^4.3.0"
   }
 }

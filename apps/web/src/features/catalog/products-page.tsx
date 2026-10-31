@@ -2,7 +2,7 @@ import { fileSavedSchema, okSchema, productPageSchema, type ProductRow } from '@
 import { Badge, Button, Input, Menu, MenuItem, Select, Sign, TableSkeleton } from '@inv/ui'
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Archive, ArchiveRestore, Ellipsis, FileDown, FileUp, Pencil, Plus, Search, Tag } from 'lucide-react'
+import { Archive, ArchiveRestore, Ellipsis, FileDown, FileUp, History, Pencil, Plus, Search, Tag } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -21,7 +21,7 @@ import { referenceQuery } from './queries'
 const ROW_HEIGHT = 56
 const PAGE_SIZE = 50
 const SEARCH_DELAY_MS = 180
-const COLUMNS = 'grid grid-cols-[minmax(14rem,2fr)_9rem_10rem_minmax(8rem,1fr)_8rem_3rem] items-center gap-4 px-4'
+const COLUMNS = 'grid grid-cols-[minmax(13rem,2fr)_8rem_9rem_minmax(7rem,1fr)_6rem_6rem_3rem] items-center gap-3 px-4'
 
 function useDebounced<T>(value: T, delay: number): T {
   const [settled, setSettled] = useState(value)
@@ -44,6 +44,7 @@ function ProductActions({
   const queryClient = useQueryClient()
   const report = useReportError()
   const canManage = useCan('catalog.manage')
+  const canViewStock = useCan('stock.view')
 
   const setArchived = useMutation({
     mutationFn: () => api(okSchema, 'POST', `/products/${product.id}/${product.archived ? 'restore' : 'archive'}`),
@@ -66,6 +67,12 @@ function ProductActions({
         <MenuItem onSelect={() => void navigate({ to: '/products/$id', params: { id: product.id } })}>
           <Pencil aria-hidden />
           {t('common.edit')}
+        </MenuItem>
+      )}
+      {canViewStock && (
+        <MenuItem onSelect={() => void navigate({ to: '/products/$id/stock', params: { id: product.id } })}>
+          <History aria-hidden />
+          {t('products.stock')}
         </MenuItem>
       )}
       <MenuItem onSelect={() => onLabels(product)}>
@@ -110,6 +117,9 @@ function ProductRowView({
       </div>
       <div role="cell" className="truncate text-ink-soft">
         {product.categoryName}
+      </div>
+      <div role="cell" className="tabular text-end">
+        {format.quantity(product.onHandMilli)}
       </div>
       <div role="cell" className="tabular text-end font-medium">
         {product.priceMinor === null ? '' : format.money(product.priceMinor)}
@@ -258,7 +268,7 @@ export function ProductsPage() {
       </div>
 
       {query.isPending ? (
-        <TableSkeleton columns={5} rows={10} />
+        <TableSkeleton columns={6} rows={10} />
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => void query.refetch()} />
       ) : products.length === 0 ? (
@@ -289,6 +299,9 @@ export function ProductsPage() {
               <span role="columnheader">{t('products.sku')}</span>
               <span role="columnheader">{t('products.barcode')}</span>
               <span role="columnheader">{t('products.category')}</span>
+              <span role="columnheader" className="text-end">
+                {t('products.onHand')}
+              </span>
               <span role="columnheader" className="text-end">
                 {t('products.price')}
               </span>

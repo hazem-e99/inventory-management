@@ -1,9 +1,11 @@
 import {
   featuresSchema,
   preferencesSchema,
+  stockPolicySchema,
   storeSchema,
   type Features,
   type Preferences,
+  type StockPolicy,
   type Store,
 } from '@inv/contracts'
 import { settingsRepo, type Database, type Kysely } from '@inv/db'
@@ -14,6 +16,7 @@ const KEYS = {
   features: 'features',
   preferences: 'preferences',
   recovery: 'recovery',
+  stockPolicy: 'stock_policy',
 } as const
 
 const DEFAULT_PREFERENCES: Preferences = { locale: 'ar', theme: 'system', digits: 'latin' }
@@ -44,6 +47,14 @@ export function storeSettings(db: Kysely<Database>) {
 
     setPreferences: (preferences: Preferences, now: number) =>
       settings.setJson(KEYS.preferences, preferences, now),
+
+    async stockPolicy(): Promise<StockPolicy> {
+      const value = await settings.getJson(KEYS.stockPolicy)
+      return value === null ? { allowNegative: false } : stockPolicySchema.parse(value)
+    },
+
+    setStockPolicy: (policy: StockPolicy, now: number) =>
+      settings.setJson(KEYS.stockPolicy, policy, now),
 
     recovery: () => settings.getJson<KeyEnvelope>(KEYS.recovery),
 

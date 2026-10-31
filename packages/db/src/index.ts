@@ -20,6 +20,13 @@ export {
   type ReferenceTable,
 } from './reference.repo'
 export { nextSequence } from './sequences'
+export { stockRepo, type StockDocumentRecord, type StockLineRecord, type VariantRule } from './stock.repo'
+export {
+  InsufficientStock,
+  stockLedger,
+  type LedgerContext,
+  type LedgerEntry,
+} from './stock.ledger'
 export type { Database } from './schema'
 export { settingsRepo } from './settings.repo'
 export { createSqliteDb, isSqliteDbHealthy, snapshotSqliteDb, type SqliteOptions } from './sqlite'

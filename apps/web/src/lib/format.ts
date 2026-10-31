@@ -9,10 +9,12 @@ export function useFormat() {
     const number = new Intl.NumberFormat(tag)
     const dateTime = new Intl.DateTimeFormat(tag, { dateStyle: 'medium', timeStyle: 'short' })
     const money = new Intl.NumberFormat(tag, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    const quantity = new Intl.NumberFormat(tag, { maximumFractionDigits: 3 })
 
     return {
       number: (value: number) => number.format(value),
       money: (minor: number) => money.format(minor / 100),
+      quantity: (milli: number) => quantity.format(milli / 1000),
       dateTime: (value: number) => dateTime.format(value),
       bytes(value: number) {
         const unit = value >= 1024 * 1024 ? 'megabyte' : 'kilobyte'

@@ -14,6 +14,7 @@ import { productRoutes } from './modules/products'
 import { referenceRoutes } from './modules/reference'
 import { rolesRoutes } from './modules/roles'
 import { settingsRoutes } from './modules/settings'
+import { stockRoutes } from './modules/stock'
 import { usersRoutes } from './modules/users'
 
 function tokenMatches(header: string | undefined, token: string): boolean {
@@ -70,6 +71,8 @@ export function createApp(deps: AppDeps) {
   app.route('/', backupRoutes(deps))
   // File routes first: their fixed paths would otherwise match `/catalog/{kind}`.
   app.route('/', catalogFileRoutes(deps))
+  // Before products, whose `/products/{id}` must not swallow `/products/{id}/stock`.
+  app.route('/', stockRoutes(deps))
   app.route('/', productRoutes(deps))
   app.route('/', referenceRoutes(deps))
 

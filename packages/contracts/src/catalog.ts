@@ -21,7 +21,7 @@ export const SYSTEM_UNITS = {
   meter: { ar: 'متر', en: 'Meter' },
 } as const
 
-export const REFERENCE_KINDS = ['categories', 'brands', 'units', 'tax-rates', 'price-lists'] as const
+export const REFERENCE_KINDS = ['categories', 'brands', 'units', 'tax-rates', 'price-lists', 'warehouses'] as const
 export type ReferenceKind = (typeof REFERENCE_KINDS)[number]
 
 export const referenceSchema = z.object({
@@ -151,6 +151,7 @@ export const productRowSchema = z.object({
   barcode: z.string().nullable(),
   priceMinor: z.number().nullable(),
   variantCount: z.number(),
+  onHandMilli: z.number(),
   archived: z.boolean(),
 })
 

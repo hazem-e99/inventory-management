@@ -9,6 +9,8 @@ export default defineConfig({
           root: 'packages/db',
           include: ['test/**/*.test.ts'],
           environment: 'node',
+          // Starting PGlite and running every migration is slow when the whole suite runs at once.
+          hookTimeout: 60_000,
         },
       },
       {

@@ -1,6 +1,7 @@
 import {
   DIGIT_STYLES,
   LOCALES,
+  stockPolicySchema,
   storeSchema,
   THEMES,
   updateStoreSchema,
@@ -9,7 +10,7 @@ import {
 } from '@inv/contracts'
 import { cn, FormSkeleton, Sign } from '@inv/ui'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { RadioGroup } from 'radix-ui'
 import type { ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
@@ -169,16 +170,57 @@ function StoreSection({ settings }: { settings: Settings }) {
   )
 }
 
+function StockPolicySection({ settings }: { settings: Settings }) {
+  const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const report = useReportError()
+
+  const update = useMutation({
+    mutationFn: (allowNegative: boolean) =>
+      api(stockPolicySchema, 'PUT', '/settings/stock-policy', { body: { allowNegative } }),
+    onSuccess: () => {
+      toast.success(t('common.saved'))
+      return queryClient.invalidateQueries({ queryKey: ['settings'] })
+    },
+    onError: report,
+  })
+
+  return (
+    <section className="flex flex-col gap-2">
+      <h2 className="text-lg font-semibold text-ink">{t('settings.stockTitle')}</h2>
+      <label className="flex cursor-pointer items-start gap-3">
+        <input
+          type="checkbox"
+          className="mt-1 size-4 accent-route"
+          checked={settings.stockPolicy.allowNegative}
+          disabled={update.isPending}
+          onChange={(event) => update.mutate(event.target.checked)}
+        />
+        <span className="flex flex-col">
+          <span className="font-medium text-ink">{t('settings.allowNegative')}</span>
+          <span className="text-sm text-ink-faint">{t('settings.allowNegativeHint')}</span>
+        </span>
+      </label>
+    </section>
+  )
+}
+
 export function SettingsPage() {
   const { t } = useTranslation()
   const query = useQuery(settingsQuery)
+  const canManage = useCan('settings.manage')
 
   return (
     <div className="flex flex-col gap-8">
       <Sign title={t('nav.settings.label')} secondary={t('nav.settings.other')} />
       <PreferencesSection />
       <QueryBoundary query={query} skeleton={<FormSkeleton />}>
-        {(settings) => <StoreSection key={settings.store.name} settings={settings} />}
+        {(settings) => (
+          <>
+            <StoreSection key={settings.store.name} settings={settings} />
+            {canManage && <StockPolicySection settings={settings} />}
+          </>
+        )}
       </QueryBoundary>
     </div>
   )

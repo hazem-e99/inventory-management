@@ -29,6 +29,7 @@ const TABLES: Record<ReferenceKind, ReferenceTable> = {
   units: 'units',
   'tax-rates': 'tax_rates',
   'price-lists': 'price_lists',
+  warehouses: 'warehouses',
 }
 
 const kindParams = z.object({ kind: z.enum(REFERENCE_KINDS) })
