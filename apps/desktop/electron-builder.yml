@@ -10,7 +10,8 @@ files:
   - "!**/better-sqlite3-multiple-ciphers/prebuilds/win32-arm64.node"
 asarUnpack:
   - "**/better-sqlite3-multiple-ciphers/prebuilds/*.node"
-# The module is Node-API, so one prebuilt binary serves both Node and Electron.
+  - "**/@node-rs/argon2-win32-x64-msvc/*.node"
+# Both native modules are Node-API, so their prebuilt binaries serve Node and Electron alike.
 npmRebuild: false
 electronFuses:
   runAsNode: false

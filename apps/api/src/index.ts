@@ -1,10 +1,13 @@
 import type { AddressInfo } from 'node:net'
 import { serve } from '@hono/node-server'
-import { createSqliteDb, migrateToLatest, settingsRepo, type SqliteOptions } from '@inv/db'
+import { createSqliteDb, migrateToLatest, sessionsRepo, settingsRepo, type SqliteOptions } from '@inv/db'
 import { createApp } from './app'
+import type { AppDeps } from './http/context'
+import { runAutomaticBackup } from './modules/backups'
 
 export interface StartOptions {
   database: SqliteOptions
+  backupsDir: string
   token: string
   allowedOrigin: string
   version: string
@@ -15,20 +18,40 @@ export interface RunningApi {
   stop(): Promise<void>
 }
 
+const AUTOMATIC_BACKUP_CHECK_MS = 60 * 60 * 1000
+
 export async function startApi(options: StartOptions): Promise<RunningApi> {
   const db = createSqliteDb(options.database)
   await migrateToLatest(db)
 
+  const clock = () => Date.now()
   const settings = settingsRepo(db)
   const bootCount = Number((await settings.get('boot_count')) ?? 0) + 1
-  await settings.set('boot_count', String(bootCount), Date.now())
+  await settings.set('boot_count', String(bootCount), clock())
+  await sessionsRepo(db).deleteExpired(clock())
 
-  const app = createApp({
+  const deps: AppDeps = {
+    db,
     token: options.token,
     allowedOrigin: options.allowedOrigin,
     version: options.version,
     bootCount,
-  })
+    databaseKey: options.database.hexKey,
+    backupsDir: options.backupsDir,
+    clock,
+    logError: (message, details) => console.error(message, details),
+  }
+
+  const app = createApp(deps)
+
+  const backUp = () => {
+    runAutomaticBackup(deps).catch((error: unknown) => {
+      deps.logError('Automatic backup failed', { message: String(error) })
+    })
+  }
+  backUp()
+  const backupTimer = setInterval(backUp, AUTOMATIC_BACKUP_CHECK_MS)
+  backupTimer.unref()
 
   return new Promise((resolve) => {
     // Port 0 lets the OS pick; the loopback bind keeps the API off the shop network.
@@ -36,6 +59,7 @@ export async function startApi(options: StartOptions): Promise<RunningApi> {
       resolve({
         port: info.port,
         stop: async () => {
+          clearInterval(backupTimer)
           await new Promise<void>((done) => server.close(() => done()))
           await db.destroy()
         },
@@ -45,3 +69,4 @@ export async function startApi(options: StartOptions): Promise<RunningApi> {
 }
 
 export { createApp } from './app'
+export type { AppDeps } from './http/context'

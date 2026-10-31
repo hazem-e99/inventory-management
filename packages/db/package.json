@@ -3,11 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": { "typecheck": "tsc -p tsconfig.json" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./backup": "./src/backup.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
   "dependencies": {
     "better-sqlite3-multiple-ciphers": "^13.0.3",
-    "kysely": "^0.29.7"
+    "kysely": "^0.29.7",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.13",

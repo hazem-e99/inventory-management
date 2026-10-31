@@ -1,5 +1,13 @@
 import { z } from 'zod'
 
+export * from './auth'
+export * from './backups'
+export * from './common'
+export * from './errors'
+export * from './permissions'
+export * from './settings'
+export * from './users'
+
 export const healthSchema = z.object({
   status: z.literal('ok'),
   version: z.string(),

@@ -1,5 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('desktop', {
-  apiConfig: (): Promise<{ baseUrl: string; token: string }> => ipcRenderer.invoke('api:config'),
+  startup: () => ipcRenderer.invoke('startup'),
+  chooseBackupFile: () => ipcRenderer.invoke('backup:choose-file'),
+  chooseBackupDestination: (defaultName: string) =>
+    ipcRenderer.invoke('backup:choose-destination', defaultName),
+  restoreBackup: (input: { path: string; recoveryCode: string }) =>
+    ipcRenderer.invoke('backup:restore', input),
 })

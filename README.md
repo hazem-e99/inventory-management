@@ -4,6 +4,8 @@
 
 - [الخطة الكاملة](docs/PLAN.md)
 - [سجل القرارات](docs/decisions.md)
+- [حقائق المنتج](PRODUCT.md)
+- [نظام التصميم](DESIGN.md)
 
 ## المتطلبات
 

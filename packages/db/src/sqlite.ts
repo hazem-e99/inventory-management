@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module'
-import { Kysely, SqliteDialect } from 'kysely'
+import { Kysely, sql, SqliteDialect } from 'kysely'
 import type BetterSqlite3 from 'better-sqlite3'
 import type { Database } from './schema'
 
@@ -13,7 +13,7 @@ export interface SqliteOptions {
 
 const HEX_KEY = /^[0-9a-f]{64}$/
 
-export function createSqliteDb(options: SqliteOptions): Kysely<Database> {
+function openEncrypted(options: SqliteOptions): BetterSqlite3.Database {
   // The key is interpolated into a PRAGMA, which cannot take bound parameters.
   if (!HEX_KEY.test(options.hexKey)) {
     throw new Error('Database key must be 64 lowercase hex characters')
@@ -27,6 +27,17 @@ export function createSqliteDb(options: SqliteOptions): Kysely<Database> {
     sqlite.pragma(`hexkey='${options.hexKey}'`)
     // First real read: a wrong key fails here rather than on some later query.
     sqlite.pragma('schema_version')
+    return sqlite
+  } catch (error) {
+    sqlite.close()
+    throw error
+  }
+}
+
+export function createSqliteDb(options: SqliteOptions): Kysely<Database> {
+  const sqlite = openEncrypted(options)
+
+  try {
     sqlite.pragma('journal_mode = WAL')
     sqlite.pragma('foreign_keys = ON')
     // FULL because shops lose power: a posted sale must survive a sudden outage.
@@ -38,4 +49,18 @@ export function createSqliteDb(options: SqliteOptions): Kysely<Database> {
   }
 
   return new Kysely<Database>({ dialect: new SqliteDialect({ database: sqlite }) })
+}
+
+/** Consistent copy of the live database, still encrypted with the same key. */
+export async function snapshotSqliteDb(db: Kysely<Database>, destination: string): Promise<void> {
+  await sql`VACUUM INTO ${destination}`.execute(db)
+}
+
+export function isSqliteDbHealthy(options: SqliteOptions): boolean {
+  const sqlite = openEncrypted(options)
+  try {
+    return sqlite.pragma('integrity_check', { simple: true }) === 'ok'
+  } finally {
+    sqlite.close()
+  }
 }

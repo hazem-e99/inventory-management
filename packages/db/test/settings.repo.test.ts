@@ -1,24 +1,14 @@
-import { randomBytes } from 'node:crypto'
-import { mkdtempSync, openSync, readSync, closeSync, rmSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { openSync, readSync, closeSync } from 'node:fs'
 import { join } from 'node:path'
-import { PGlite } from '@electric-sql/pglite'
-import { Kysely, PGliteDialect } from 'kysely'
+import type { Kysely } from 'kysely'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createSqliteDb, migrateToLatest, settingsRepo, type Database } from '../src'
+import { dialects, newHexKey, tempDir } from './helpers'
 
-const dir = mkdtempSync(join(tmpdir(), 'inv-db-'))
-const hexKey = randomBytes(32).toString('hex')
+const dir = tempDir()
+const hexKey = newHexKey()
 
-afterAll(() => rmSync(dir, { recursive: true, force: true }))
-
-// Every repository test runs on both dialects, so a Postgres incompatibility fails CI.
-const dialects: Array<[string, () => Kysely<Database>]> = [
-  ['sqlite', () => createSqliteDb({ path: join(dir, 'contract.db'), hexKey })],
-  ['pglite', () => new Kysely<Database>({ dialect: new PGliteDialect({ pglite: new PGlite() }) })],
-]
-
-describe.each(dialects)('settings repository on %s', (_name, create) => {
+describe.each(dialects(dir))('settings repository on %s', (_name, create) => {
   let db: Kysely<Database>
 
   beforeAll(async () => {
@@ -43,6 +33,12 @@ describe.each(dialects)('settings repository on %s', (_name, create) => {
     const repo = settingsRepo(db)
     await repo.set('store_name', 'صيدلية النور', 3)
     expect(await repo.get('store_name')).toBe('صيدلية النور')
+  })
+
+  it('round-trips JSON values', async () => {
+    const repo = settingsRepo(db)
+    await repo.setJson('prefs', { locale: 'ar', nested: { digits: 'latin' } }, 4)
+    expect(await repo.getJson('prefs')).toEqual({ locale: 'ar', nested: { digits: 'latin' } })
   })
 })
 
@@ -71,8 +67,7 @@ describe('sqlite encryption', () => {
   })
 
   it('refuses the wrong key', () => {
-    const wrongKey = randomBytes(32).toString('hex')
-    expect(() => createSqliteDb({ path, hexKey: wrongKey })).toThrow()
+    expect(() => createSqliteDb({ path, hexKey: newHexKey() })).toThrow()
   })
 
   it('rejects a malformed key before it reaches the PRAGMA', () => {

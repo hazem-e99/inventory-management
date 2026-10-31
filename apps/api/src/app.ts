@@ -1,37 +1,75 @@
-import { Hono } from 'hono'
-import { bearerAuth } from 'hono/bearer-auth'
-import { cors } from 'hono/cors'
+import { randomUUID, timingSafeEqual } from 'node:crypto'
 import type { Health } from '@inv/contracts'
+import { cors } from 'hono/cors'
+import type { AppDeps } from './http/context'
+import { AppError, handleError } from './http/errors'
+import { router } from './http/routing'
+import { SESSION_HEADER } from './http/session'
+import { auditRoutes } from './modules/audit'
+import { authRoutes } from './modules/auth'
+import { backupRoutes } from './modules/backups'
+import { onboardingRoutes } from './modules/onboarding'
+import { rolesRoutes } from './modules/roles'
+import { settingsRoutes } from './modules/settings'
+import { usersRoutes } from './modules/users'
 
-export interface AppOptions {
-  token: string
-  allowedOrigin: string
-  version: string
-  bootCount: number
+function tokenMatches(header: string | undefined, token: string): boolean {
+  const expected = Buffer.from(`Bearer ${token}`)
+  const received = Buffer.from(header ?? '')
+  return received.length === expected.length && timingSafeEqual(received, expected)
 }
 
-export function createApp(options: AppOptions) {
-  const app = new Hono()
+export function createApp(deps: AppDeps) {
+  const app = router()
+
+  app.onError(handleError(deps))
+  app.notFound(() => {
+    throw new AppError('NOT_FOUND')
+  })
+
+  app.use(async (c, next) => {
+    c.set('traceId', randomUUID())
+    await next()
+  })
 
   app.use(
     cors({
-      origin: options.allowedOrigin,
+      origin: deps.allowedOrigin,
       allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      allowHeaders: ['Authorization', 'Content-Type'],
+      allowHeaders: ['Authorization', 'Content-Type', SESSION_HEADER],
     }),
   )
 
   // CORS only stops browsers reading the response, so foreign origins are refused outright.
   app.use(async (c, next) => {
     const origin = c.req.header('Origin')
-    if (origin && origin !== options.allowedOrigin) return c.json({ code: 'FORBIDDEN_ORIGIN' }, 403)
+    if (origin && origin !== deps.allowedOrigin) throw new AppError('FORBIDDEN_ORIGIN')
     await next()
   })
 
-  app.use(bearerAuth({ token: options.token }))
+  // Proves the caller is this app's window; the session below proves who is using it.
+  app.use(async (c, next) => {
+    if (!tokenMatches(c.req.header('Authorization'), deps.token)) throw new AppError('UNAUTHENTICATED')
+    await next()
+  })
 
-  return app.get('/health', (c) => {
-    const health: Health = { status: 'ok', version: options.version, bootCount: options.bootCount }
+  app.get('/health', (c) => {
+    const health: Health = { status: 'ok', version: deps.version, bootCount: deps.bootCount }
     return c.json(health)
   })
+
+  app.route('/', onboardingRoutes(deps))
+  app.route('/', authRoutes(deps))
+  app.route('/', usersRoutes(deps))
+  app.route('/', rolesRoutes(deps))
+  app.route('/', settingsRoutes(deps))
+  app.route('/', auditRoutes(deps))
+  app.route('/', backupRoutes(deps))
+
+  app.doc('/openapi.json', {
+    openapi: '3.1.0',
+    info: { title: 'Inventory API', version: deps.version },
+  })
+
+  return app
 }
