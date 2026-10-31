@@ -5,6 +5,9 @@ export const PERMISSIONS = [
   'settings.manage',
   'audit.view',
   'backups.manage',
+  'catalog.view',
+  'catalog.manage',
+  'catalog.import',
 ] as const
 
 export type Permission = (typeof PERMISSIONS)[number]

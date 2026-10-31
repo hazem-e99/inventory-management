@@ -32,6 +32,10 @@ pnpm test:e2e
 ```
 
 ```bash
+pnpm bench
+```
+
+```bash
 pnpm dist
 ```
 

@@ -69,7 +69,7 @@ export function RestoreForm({ onCancel }: { onCancel?: () => void }) {
 export function RestoreScreen({ onCancel }: { onCancel?: () => void }) {
   const { t } = useTranslation()
   return (
-    <PlateLayout sign={t('backups.fullTitle')} secondary={t('product.otherName')}>
+    <PlateLayout sign={t('backups.fullTitle')} secondary={t('app.otherName')}>
       <FormHeading title={t('backups.fullTitle')} body={t('backups.fullBody')} />
       <RestoreForm {...(onCancel ? { onCancel } : {})} />
     </PlateLayout>

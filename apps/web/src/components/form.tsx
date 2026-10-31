@@ -84,10 +84,14 @@ export function SubmitButton({
 }
 
 /** Holds navigation while a form has edits, so nothing is lost to a stray click. */
-export function UnsavedGuard({ when }: { when: boolean }) {
+export function UnsavedGuard({ when }: { when: boolean | (() => boolean) }) {
   const { t } = useTranslation()
   // beforeunload stays off: in Electron it silently stops the window from closing at all.
-  const blocker = useBlocker({ shouldBlockFn: () => when, withResolver: true, enableBeforeUnload: false })
+  const blocker = useBlocker({
+    shouldBlockFn: () => (typeof when === 'function' ? when() : when),
+    withResolver: true,
+    enableBeforeUnload: false,
+  })
 
   return (
     <Dialog

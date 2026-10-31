@@ -163,6 +163,26 @@ function registerIpc(): void {
     return result.canceled ? null : (result.filePath ?? null)
   })
 
+  handle('catalog:choose-file', async (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    if (!window) return null
+    const result = await dialog.showOpenDialog(window, {
+      properties: ['openFile'],
+      filters: [{ name: 'Excel or CSV', extensions: ['xlsx', 'csv'] }],
+    })
+    return result.canceled ? null : (result.filePaths[0] ?? null)
+  })
+
+  handle('catalog:choose-destination', async (event, defaultName: string) => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    if (!window) return null
+    const result = await dialog.showSaveDialog(window, {
+      defaultPath: defaultName,
+      filters: [{ name: 'Excel', extensions: ['xlsx'] }],
+    })
+    return result.canceled ? null : (result.filePath ?? null)
+  })
+
   handle(
     'backup:restore',
     async (event, input: { path: string; recoveryCode: string }) => {

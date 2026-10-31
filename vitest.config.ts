@@ -13,8 +13,24 @@ export default defineConfig({
       },
       {
         test: {
+          name: 'bench',
+          root: 'packages/db',
+          include: ['bench/**/*.bench.test.ts'],
+          environment: 'node',
+        },
+      },
+      {
+        test: {
           name: 'i18n',
           root: 'packages/i18n',
+          include: ['test/**/*.test.ts'],
+          environment: 'node',
+        },
+      },
+      {
+        test: {
+          name: 'domain',
+          root: 'packages/domain',
           include: ['test/**/*.test.ts'],
           environment: 'node',
         },

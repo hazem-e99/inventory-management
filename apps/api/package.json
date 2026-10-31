@@ -18,7 +18,9 @@
     "@hono/zod-openapi": "^1.6.3",
     "@inv/domain": "workspace:*",
     "@node-rs/argon2": "^2.0.2",
-    "zod": "^4.6.7"
+    "zod": "^4.6.7",
+    "read-excel-file": "^9.3.14",
+    "write-excel-file": "^4.1.1"
   },
   "devDependencies": {
     "@types/node": "^24.0.0"

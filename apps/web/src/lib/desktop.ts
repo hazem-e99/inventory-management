@@ -12,6 +12,8 @@ declare global {
       startup(): Promise<Startup>
       chooseBackupFile(): Promise<string | null>
       chooseBackupDestination(defaultName: string): Promise<string | null>
+      chooseCatalogFile(): Promise<string | null>
+      chooseSpreadsheetDestination(defaultName: string): Promise<string | null>
       restoreBackup(input: { path: string; recoveryCode: string }): Promise<RestoreResult>
     }
   }

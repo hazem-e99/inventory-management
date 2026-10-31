@@ -11,9 +11,10 @@
     "build": "pnpm --filter @inv/desktop build",
     "dist": "pnpm --filter @inv/desktop dist",
     "typecheck": "pnpm -r typecheck",
-    "test": "vitest run",
+    "test": "vitest run --project \"!bench\"",
     "test:db": "vitest run --project db",
-    "test:e2e": "pnpm --filter @inv/desktop test:e2e"
+    "test:e2e": "pnpm --filter @inv/desktop test:e2e",
+    "bench": "vitest run --project bench --silent=false"
   },
   "devDependencies": {
     "typescript": "^7.0.2",

@@ -355,7 +355,7 @@ export function Onboarding({ onRestore }: { onRestore: () => void }) {
   return (
     <PlateLayout
       sign={t('onboarding.welcome')}
-      secondary={t('product.otherName')}
+      secondary={t('app.otherName')}
       plate={
         <Stops
           aria-label={t('onboarding.stops')}

@@ -24,7 +24,10 @@ export function useErrorText() {
  * Field errors land under their inputs and the first one takes focus. Anything without a
  * field becomes a toast, so a failed save always tells the user what happened.
  */
-export function useReportError<T extends FieldValues>(form?: UseFormReturn<T>) {
+export function useReportError<T extends FieldValues>(
+  form?: UseFormReturn<T, unknown, any>,
+  mapField: (path: string) => string | null = (path) => path,
+) {
   const errorText = useErrorText()
 
   return useCallback(
@@ -32,18 +35,24 @@ export function useReportError<T extends FieldValues>(form?: UseFormReturn<T>) {
       const { code, params, fields } = errorDetails(error)
       const entries = Object.entries(fields ?? {})
 
-      if (form && entries.length > 0) {
-        entries.forEach(([field, codes], index) => {
+      let shown = false
+      if (form) {
+        for (const [field, codes] of entries) {
+          const target = mapField(field)
+          if (!target) continue
           form.setError(
-            field as Path<T>,
+            target as Path<T>,
             { type: 'server', message: codes[0] ?? 'INVALID_VALUE' },
-            { shouldFocus: index === 0 },
+            { shouldFocus: !shown },
           )
-        })
-        return
+          shown = true
+        }
       }
-      toast.error(errorText(code, params))
+      if (shown) return
+
+      // A problem with no input to sit under still has to reach the user, with its reason.
+      toast.error(errorText(entries[0]?.[1][0] ?? code, params))
     },
-    [errorText, form],
+    [errorText, form, mapField],
   )
 }

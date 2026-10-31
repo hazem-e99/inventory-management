@@ -52,6 +52,8 @@ export function validationError(error: ZodError): AppError {
 const CONSTRAINT_FIELDS: Record<string, [string, ErrorCode]> = {
   'users.username': ['username', 'USERNAME_TAKEN'],
   'roles.name': ['name', 'ROLE_NAME_TAKEN'],
+  'product_variants.sku': ['sku', 'SKU_TAKEN'],
+  'barcodes.code': ['barcode', 'BARCODE_TAKEN'],
 }
 
 function fromConstraint(error: unknown): AppError | null {

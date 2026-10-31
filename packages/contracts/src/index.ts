@@ -2,6 +2,8 @@ import { z } from 'zod'
 
 export * from './auth'
 export * from './backups'
+export * from './catalog'
+export * from './catalog-import'
 export * from './common'
 export * from './errors'
 export * from './permissions'

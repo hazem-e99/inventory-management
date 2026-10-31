@@ -1,7 +1,7 @@
 import { bootstrapSchema, type Bootstrap } from '@inv/contracts'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Toaster } from 'sonner'
 import { CrashBoundary, ErrorState, TopProgress } from './components/states'
@@ -55,8 +55,15 @@ function ThemedToaster() {
     <Toaster
       dir={preferences.locale === 'ar' ? 'rtl' : 'ltr'}
       position="bottom-center"
-      richColors
       theme={preferences.theme}
+      // Tied to the design tokens: the library's rich colours fall short of AA contrast.
+      style={
+        {
+          '--normal-bg': 'var(--surface)',
+          '--normal-text': 'var(--ink)',
+          '--normal-border': 'var(--rule-strong)',
+        } as CSSProperties
+      }
       toastOptions={{ style: { fontFamily: 'inherit', fontSize: '1rem' } }}
     />
   )
@@ -66,7 +73,7 @@ function Loaded() {
   const query = useQuery(bootstrapQuery)
   const { t } = useTranslation()
 
-  if (query.isPending) return <p className="sr-only">{t('product.name')}</p>
+  if (query.isPending) return <p className="sr-only">{t('app.name')}</p>
   if (query.isError) {
     return (
       <div className="p-8">

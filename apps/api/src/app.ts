@@ -8,7 +8,10 @@ import { SESSION_HEADER } from './http/session'
 import { auditRoutes } from './modules/audit'
 import { authRoutes } from './modules/auth'
 import { backupRoutes } from './modules/backups'
+import { catalogFileRoutes } from './modules/catalog-import'
 import { onboardingRoutes } from './modules/onboarding'
+import { productRoutes } from './modules/products'
+import { referenceRoutes } from './modules/reference'
 import { rolesRoutes } from './modules/roles'
 import { settingsRoutes } from './modules/settings'
 import { usersRoutes } from './modules/users'
@@ -65,6 +68,10 @@ export function createApp(deps: AppDeps) {
   app.route('/', settingsRoutes(deps))
   app.route('/', auditRoutes(deps))
   app.route('/', backupRoutes(deps))
+  // File routes first: their fixed paths would otherwise match `/catalog/{kind}`.
+  app.route('/', catalogFileRoutes(deps))
+  app.route('/', productRoutes(deps))
+  app.route('/', referenceRoutes(deps))
 
   app.doc('/openapi.json', {
     openapi: '3.1.0',

@@ -1,5 +1,49 @@
 {
-  "product": { "name": "المخزون", "otherName": "Stock" },
+  "app": {
+    "name": "المخزون",
+    "otherName": "Stock"
+  },
+  "product": {
+    "newTitle": "صنف جديد",
+    "basics": "البيانات الأساسية",
+    "name": "اسم الصنف",
+    "nameEn": "الاسم بالإنجليزية",
+    "genericName": "الاسم العلمي",
+    "genericHint": "يساعد في البحث عن البدائل",
+    "description": "وصف",
+    "category": "التصنيف",
+    "brand": "الماركة",
+    "tax": "الضريبة",
+    "none": "بدون",
+    "prescription": "يصرف بروشتة",
+    "trackLots": "تتبع الدُفعات وتاريخ الصلاحية",
+    "trackSerials": "تتبع الأرقام المسلسلة",
+    "units": "الوحدات",
+    "unitsBody": "الوحدة الأساسية هي أصغر وحدة تبيعها. أضف الوحدات الأكبر وعدد ما تحويه.",
+    "baseUnit": "الوحدة الأساسية",
+    "addUnit": "إضافة وحدة أكبر",
+    "unit": "الوحدة",
+    "factor": "تحتوي على ({{unit}})",
+    "remove": "حذف",
+    "pricing": "الأسعار والباركود",
+    "cost": "سعر الشراء",
+    "sku": "كود الصنف",
+    "skuHint": "اتركه فارغاً ليتم توليده",
+    "barcodes": "الباركود",
+    "addBarcode": "إضافة باركود",
+    "generate": "توليد باركود",
+    "barcode": "الباركود",
+    "variantsTitle": "الأنواع",
+    "matrixBody": "اختر المقاسات والألوان، وسننشئ نوعاً لكل تركيبة.",
+    "newValue": "قيمة جديدة",
+    "addValue": "إضافة",
+    "buildVariants": "إنشاء الأنواع",
+    "variantLabel": "اسم النوع",
+    "addVariant": "إضافة نوع",
+    "removeVariant": "حذف النوع",
+    "saved": "تم حفظ الصنف",
+    "save": "حفظ الصنف"
+  },
   "common": {
     "add": "إضافة",
     "back": "رجوع",
@@ -26,12 +70,38 @@
   },
   "nav": {
     "main": "القائمة الرئيسية",
-    "home": { "label": "الرئيسية", "other": "Home" },
-    "users": { "label": "المستخدمون", "other": "Users" },
-    "roles": { "label": "الأدوار والصلاحيات", "other": "Roles" },
-    "audit": { "label": "سجل المراجعة", "other": "Audit log" },
-    "backups": { "label": "النسخ الاحتياطي", "other": "Backups" },
-    "settings": { "label": "الإعدادات", "other": "Settings" }
+    "home": {
+      "label": "الرئيسية",
+      "other": "Home"
+    },
+    "users": {
+      "label": "المستخدمون",
+      "other": "Users"
+    },
+    "roles": {
+      "label": "الأدوار والصلاحيات",
+      "other": "Roles"
+    },
+    "audit": {
+      "label": "سجل المراجعة",
+      "other": "Audit log"
+    },
+    "backups": {
+      "label": "النسخ الاحتياطي",
+      "other": "Backups"
+    },
+    "settings": {
+      "label": "الإعدادات",
+      "other": "Settings"
+    },
+    "products": {
+      "label": "الأصناف",
+      "other": "Items"
+    },
+    "catalog": {
+      "label": "بيانات الأصناف",
+      "other": "Catalog setup"
+    }
   },
   "account": {
     "changePassword": "تغيير كلمة المرور",
@@ -39,14 +109,40 @@
     "setPin": "تعيين رمز الدخول السريع",
     "signOut": "تسجيل الخروج"
   },
-  "language": { "label": "اللغة", "ar": "العربية", "en": "English", "switch": "English" },
-  "theme": { "label": "المظهر", "system": "حسب النظام", "light": "فاتح", "dark": "داكن" },
-  "digits": { "label": "شكل الأرقام", "latin": "123", "arabic": "١٢٣" },
+  "language": {
+    "label": "اللغة",
+    "ar": "العربية",
+    "en": "English",
+    "switch": "English"
+  },
+  "theme": {
+    "label": "المظهر",
+    "system": "حسب النظام",
+    "light": "فاتح",
+    "dark": "داكن"
+  },
+  "digits": {
+    "label": "شكل الأرقام",
+    "latin": "123",
+    "arabic": "١٢٣"
+  },
   "business": {
-    "pharmacy": { "name": "صيدلية", "description": "تتبع الدُفعات وتواريخ الصلاحية لكل صنف" },
-    "supermarket": { "name": "سوبر ماركت", "description": "كميات بالوزن، وأصناف كثيرة، وبيع سريع" },
-    "clothing": { "name": "محل ملابس", "description": "مقاسات وألوان لكل موديل" },
-    "general": { "name": "نشاط آخر", "description": "إلكترونيات وأدوات وغيرها، مع أرقام مسلسلة" }
+    "pharmacy": {
+      "name": "صيدلية",
+      "description": "تتبع الدُفعات وتواريخ الصلاحية لكل صنف"
+    },
+    "supermarket": {
+      "name": "سوبر ماركت",
+      "description": "كميات بالوزن، وأصناف كثيرة، وبيع سريع"
+    },
+    "clothing": {
+      "name": "محل ملابس",
+      "description": "مقاسات وألوان لكل موديل"
+    },
+    "general": {
+      "name": "نشاط آخر",
+      "description": "إلكترونيات وأدوات وغيرها، مع أرقام مسلسلة"
+    }
   },
   "onboarding": {
     "stops": "خطوات إعداد البرنامج",
@@ -170,7 +266,10 @@
     "roles.manage": "إدارة الأدوار",
     "settings.manage": "تعديل بيانات المحل",
     "audit.view": "عرض سجل المراجعة",
-    "backups.manage": "إدارة النسخ الاحتياطي"
+    "backups.manage": "إدارة النسخ الاحتياطي",
+    "catalog.view": "عرض الأصناف",
+    "catalog.manage": "إدارة الأصناف",
+    "catalog.import": "استيراد وتصدير الأصناف"
   },
   "audit": {
     "time": "الوقت",
@@ -195,7 +294,16 @@
       "role.updated": "تعديل دور",
       "role.deleted": "حذف دور",
       "backup.created": "إنشاء نسخة احتياطية",
-      "backup.exported": "تصدير نسخة احتياطية"
+      "backup.exported": "تصدير نسخة احتياطية",
+      "reference.created": "إضافة بيانات مرجعية",
+      "reference.updated": "تعديل بيانات مرجعية",
+      "reference.deleted": "حذف بيانات مرجعية",
+      "product.created": "إضافة صنف",
+      "product.updated": "تعديل صنف",
+      "product.archived": "أرشفة صنف",
+      "product.restored": "استعادة صنف",
+      "catalog.imported": "استيراد أصناف",
+      "catalog.exported": "تصدير أصناف"
     }
   },
   "backups": {
@@ -279,6 +387,149 @@
     "BACKUP_FAILED": "تعذر إنشاء النسخة. تأكد من وجود مساحة كافية وأن المكان متاح للكتابة.",
     "BACKUP_INVALID": "هذا الملف ليس نسخة احتياطية صالحة، أو أنه تالف.",
     "BACKUP_TOO_NEW": "هذه النسخة من إصدار أحدث. حدّث البرنامج ثم حاول مرة أخرى.",
-    "RESTORE_FAILED": "تعذر الاسترجاع. بياناتك الحالية لم تتغير."
+    "RESTORE_FAILED": "تعذر الاسترجاع. بياناتك الحالية لم تتغير.",
+    "NAME_TAKEN": "هذا الاسم مستخدم بالفعل. اختر اسماً آخر.",
+    "SKU_TAKEN": "كود الصنف مستخدم لصنف آخر. غيّره أو اتركه فارغاً ليتم توليده.",
+    "BARCODE_INVALID": "الباركود غير صحيح. راجع الأرقام، فرقم التحقق الأخير لا يطابق.",
+    "BARCODE_TAKEN": "هذا الباركود مسجل لصنف آخر.",
+    "BARCODE_DUPLICATED": "هذا الباركود مكرر. كل باركود يجب أن يكون لصنف واحد.",
+    "PRICE_INVALID": "السعر غير صحيح. اكتب رقماً، بحد أقصى رقمين بعد العلامة.",
+    "FACTOR_INVALID": "اكتب عدد الوحدات، رقماً أكبر من صفر.",
+    "UNIT_DUPLICATED": "هذه الوحدة مضافة بالفعل.",
+    "UNIT_NOT_FOUND": "الوحدة غير معروفة. أضفها أولاً من بيانات الأصناف.",
+    "VARIANT_REQUIRED": "أضف نوعاً واحداً على الأقل.",
+    "VARIANT_LABEL_REQUIRED": "اكتب اسماً يميز هذا النوع.",
+    "CATEGORY_CYCLE": "لا يمكن وضع تصنيف داخل نفسه.",
+    "REFERENCE_IN_USE": "لا يمكن الحذف لأن {{count}} صنف مرتبط به. انقل الأصناف أو أرشفه بدلاً من الحذف.",
+    "REFERENCE_IS_SYSTEM": "هذا عنصر أساسي، لا يمكن تغيير اسمه أو حذفه.",
+    "IMPORT_FILE_INVALID": "اختر ملف Excel بامتداد xlsx أو ملف csv.",
+    "IMPORT_FILE_UNREADABLE": "تعذرت قراءة الملف. تأكد أنه غير مفتوح في برنامج آخر وأنه غير تالف.",
+    "IMPORT_COLUMNS_MISSING": "الملف ينقصه عمود: {{columns}}. استخدم النموذج الجاهز.",
+    "IMPORT_TOO_MANY_ROWS": "الملف أكبر من المسموح ({{limit}}). قسّمه إلى ملفات أصغر.",
+    "IMPORT_EMPTY": "الملف لا يحتوي على أصناف.",
+    "EXPORT_FAILED": "تعذر حفظ الملف. تأكد أن المكان متاح للكتابة وأن الملف غير مفتوح."
+  },
+  "reference": {
+    "tabs": {
+      "categories": "التصنيفات",
+      "brands": "الماركات",
+      "units": "الوحدات",
+      "tax-rates": "الضرائب",
+      "price-lists": "قوائم الأسعار"
+    },
+    "name": "الاسم",
+    "parent": "التصنيف الرئيسي",
+    "noParent": "بدون",
+    "allowsFraction": "تقبل الكسور (مثل 1.25)",
+    "fraction": "كسور",
+    "rate": "النسبة %",
+    "usage": "الأصناف",
+    "system": "أساسي",
+    "archived": "مؤرشف",
+    "add": "إضافة",
+    "addTitle": "عنصر جديد",
+    "editTitle": "تعديل {{name}}",
+    "archive": "أرشفة",
+    "restore": "استعادة",
+    "saved": "تم الحفظ",
+    "deleted": "تم الحذف",
+    "deleteTitle": "حذف {{name}}؟",
+    "deleteBody": "لا يمكن التراجع عن هذا الإجراء.",
+    "emptyTitle": "لا توجد عناصر",
+    "emptyBody": "أضف أول عنصر، أو سيتم إنشاؤه تلقائياً عند استيراد الأصناف.",
+    "units": {
+      "piece": "قطعة",
+      "box": "علبة",
+      "strip": "شريط",
+      "carton": "كرتونة",
+      "bottle": "زجاجة",
+      "kilogram": "كيلوجرام",
+      "gram": "جرام",
+      "liter": "لتر",
+      "meter": "متر"
+    },
+    "taxes": {
+      "vat": "ضريبة القيمة المضافة",
+      "exempt": "معفى"
+    },
+    "priceLists": {
+      "retail": "سعر القطاعي"
+    },
+    "attributes": {
+      "size": "المقاس",
+      "color": "اللون"
+    }
+  },
+  "products": {
+    "add": "إضافة صنف",
+    "search": "ابحث بالاسم أو الباركود أو الكود",
+    "allCategories": "كل التصنيفات",
+    "showArchived": "الأصناف المؤرشفة",
+    "total": "عدد الأصناف: {{value}}",
+    "name": "الصنف",
+    "sku": "الكود",
+    "barcode": "الباركود",
+    "category": "التصنيف",
+    "price": "السعر",
+    "variants": "عدد الأنواع: {{count}}",
+    "emptyTitle": "لا توجد أصناف بعد",
+    "emptyBody": "أضف أول صنف، أو استورد قائمة أصنافك من ملف Excel.",
+    "noMatchTitle": "لا توجد نتائج",
+    "noMatchBody": "جرّب كلمة أخرى أو تأكد من التصفية المختارة.",
+    "archive": "أرشفة",
+    "restore": "استعادة",
+    "archived": "تمت الأرشفة",
+    "restored": "تمت الاستعادة",
+    "labels": "طباعة ملصقات",
+    "actions": "إجراءات {{name}}",
+    "file": "استيراد وتصدير",
+    "import": "استيراد من ملف",
+    "export": "تصدير الأصناف",
+    "exported": "تم حفظ الملف ({{count}} صنف)"
+  },
+  "import": {
+    "title": "استيراد الأصناف",
+    "intro": "اختر ملف Excel أو CSV. الصف الأول يجب أن يحتوي على أسماء الأعمدة، وعمود اسم الصنف مطلوب.",
+    "template": "تحميل نموذج جاهز",
+    "choose": "اختيار ملف",
+    "checking": "جاري فحص الملف",
+    "summary": "الصفوف في الملف: {{total}}",
+    "valid": "صفوف سليمة: {{value}}",
+    "invalid": "صفوف بها أخطاء: {{value}}",
+    "created": "سيتم إنشاء {{categories}} تصنيف و{{brands}} ماركة جديدة.",
+    "issuesTitle": "الأخطاء",
+    "issueRow": "صف {{row}}",
+    "moreIssues": "و{{count}} خطأ آخر في التقرير الكامل.",
+    "saveReport": "حفظ تقرير الأخطاء",
+    "reportSaved": "تم حفظ التقرير",
+    "submit": "استيراد {{count}} صنف",
+    "done": "تم استيراد {{count}} صنف",
+    "reportRow": "الصف",
+    "reportColumn": "العمود",
+    "reportValue": "القيمة",
+    "reportProblem": "المشكلة",
+    "columns": {
+      "name": "اسم الصنف",
+      "nameEn": "الاسم بالإنجليزية",
+      "genericName": "الاسم العلمي",
+      "category": "التصنيف",
+      "brand": "الماركة",
+      "unit": "الوحدة",
+      "barcode": "الباركود",
+      "sku": "كود الصنف",
+      "price": "سعر البيع",
+      "cost": "سعر الشراء"
+    }
+  },
+  "labels": {
+    "title": "طباعة ملصقات {{name}}",
+    "noBarcode": "لا يوجد باركود لهذا الصنف. أضف باركوداً أولاً.",
+    "copies": "عدد النسخ",
+    "paper": "نوع الورق",
+    "roll": "رول ملصقات 38×25 مم",
+    "sheet": "ورق A4 (شبكة)",
+    "showPrice": "إظهار السعر",
+    "print": "طباعة",
+    "currency": "ج.م"
   }
 }

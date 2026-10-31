@@ -1,5 +1,49 @@
 {
-  "product": { "name": "Stock", "otherName": "المخزون" },
+  "app": {
+    "name": "Stock",
+    "otherName": "المخزون"
+  },
+  "product": {
+    "newTitle": "New item",
+    "basics": "Basic details",
+    "name": "Item name",
+    "nameEn": "English name",
+    "genericName": "Generic name",
+    "genericHint": "Helps when searching for alternatives",
+    "description": "Description",
+    "category": "Category",
+    "brand": "Brand",
+    "tax": "Tax",
+    "none": "None",
+    "prescription": "Prescription required",
+    "trackLots": "Track batches and expiry dates",
+    "trackSerials": "Track serial numbers",
+    "units": "Units",
+    "unitsBody": "The base unit is the smallest one you sell. Add larger units and how many each holds.",
+    "baseUnit": "Base unit",
+    "addUnit": "Add a larger unit",
+    "unit": "Unit",
+    "factor": "Holds ({{unit}})",
+    "remove": "Remove",
+    "pricing": "Prices and barcodes",
+    "cost": "Cost price",
+    "sku": "Item code",
+    "skuHint": "Leave empty to generate one",
+    "barcodes": "Barcodes",
+    "addBarcode": "Add barcode",
+    "generate": "Generate barcode",
+    "barcode": "Barcode",
+    "variantsTitle": "Variants",
+    "matrixBody": "Choose sizes and colors, and we create a variant for each combination.",
+    "newValue": "New value",
+    "addValue": "Add",
+    "buildVariants": "Create variants",
+    "variantLabel": "Variant name",
+    "addVariant": "Add variant",
+    "removeVariant": "Remove variant",
+    "saved": "Item saved",
+    "save": "Save item"
+  },
   "common": {
     "add": "Add",
     "back": "Back",
@@ -26,12 +70,38 @@
   },
   "nav": {
     "main": "Main menu",
-    "home": { "label": "Home", "other": "الرئيسية" },
-    "users": { "label": "Users", "other": "المستخدمون" },
-    "roles": { "label": "Roles and permissions", "other": "الأدوار والصلاحيات" },
-    "audit": { "label": "Audit log", "other": "سجل المراجعة" },
-    "backups": { "label": "Backups", "other": "النسخ الاحتياطي" },
-    "settings": { "label": "Settings", "other": "الإعدادات" }
+    "home": {
+      "label": "Home",
+      "other": "الرئيسية"
+    },
+    "users": {
+      "label": "Users",
+      "other": "المستخدمون"
+    },
+    "roles": {
+      "label": "Roles and permissions",
+      "other": "الأدوار والصلاحيات"
+    },
+    "audit": {
+      "label": "Audit log",
+      "other": "سجل المراجعة"
+    },
+    "backups": {
+      "label": "Backups",
+      "other": "النسخ الاحتياطي"
+    },
+    "settings": {
+      "label": "Settings",
+      "other": "الإعدادات"
+    },
+    "products": {
+      "label": "Items",
+      "other": "الأصناف"
+    },
+    "catalog": {
+      "label": "Catalog setup",
+      "other": "بيانات الأصناف"
+    }
   },
   "account": {
     "changePassword": "Change password",
@@ -39,14 +109,40 @@
     "setPin": "Set quick sign-in PIN",
     "signOut": "Sign out"
   },
-  "language": { "label": "Language", "ar": "العربية", "en": "English", "switch": "العربية" },
-  "theme": { "label": "Appearance", "system": "Match system", "light": "Light", "dark": "Dark" },
-  "digits": { "label": "Number style", "latin": "123", "arabic": "١٢٣" },
+  "language": {
+    "label": "Language",
+    "ar": "العربية",
+    "en": "English",
+    "switch": "العربية"
+  },
+  "theme": {
+    "label": "Appearance",
+    "system": "Match system",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "digits": {
+    "label": "Number style",
+    "latin": "123",
+    "arabic": "١٢٣"
+  },
   "business": {
-    "pharmacy": { "name": "Pharmacy", "description": "Track batches and expiry dates for every item" },
-    "supermarket": { "name": "Supermarket", "description": "Weighed goods, many items, fast checkout" },
-    "clothing": { "name": "Clothing store", "description": "Sizes and colours for each style" },
-    "general": { "name": "Something else", "description": "Electronics, tools and more, with serial numbers" }
+    "pharmacy": {
+      "name": "Pharmacy",
+      "description": "Track batches and expiry dates for every item"
+    },
+    "supermarket": {
+      "name": "Supermarket",
+      "description": "Weighed goods, many items, fast checkout"
+    },
+    "clothing": {
+      "name": "Clothing store",
+      "description": "Sizes and colours for each style"
+    },
+    "general": {
+      "name": "Something else",
+      "description": "Electronics, tools and more, with serial numbers"
+    }
   },
   "onboarding": {
     "stops": "Setup steps",
@@ -170,7 +266,10 @@
     "roles.manage": "Manage roles",
     "settings.manage": "Edit store details",
     "audit.view": "View the audit log",
-    "backups.manage": "Manage backups"
+    "backups.manage": "Manage backups",
+    "catalog.view": "View items",
+    "catalog.manage": "Manage items",
+    "catalog.import": "Import and export items"
   },
   "audit": {
     "time": "Time",
@@ -195,7 +294,16 @@
       "role.updated": "Role edited",
       "role.deleted": "Role deleted",
       "backup.created": "Backup created",
-      "backup.exported": "Backup exported"
+      "backup.exported": "Backup exported",
+      "reference.created": "Catalog data added",
+      "reference.updated": "Catalog data edited",
+      "reference.deleted": "Catalog data deleted",
+      "product.created": "Item added",
+      "product.updated": "Item edited",
+      "product.archived": "Item archived",
+      "product.restored": "Item restored",
+      "catalog.imported": "Items imported",
+      "catalog.exported": "Items exported"
     }
   },
   "backups": {
@@ -279,6 +387,149 @@
     "BACKUP_FAILED": "The backup couldn't be created. Check there's enough space and the location is writable.",
     "BACKUP_INVALID": "This file isn't a valid backup, or it's damaged.",
     "BACKUP_TOO_NEW": "This backup is from a newer version. Update the app, then try again.",
-    "RESTORE_FAILED": "The restore failed. Your current data wasn't changed."
+    "RESTORE_FAILED": "The restore failed. Your current data wasn't changed.",
+    "NAME_TAKEN": "That name is already in use. Choose another one.",
+    "SKU_TAKEN": "That item code belongs to another item. Change it, or leave it empty to generate one.",
+    "BARCODE_INVALID": "That barcode isn't valid. Check the digits: the last one doesn't match.",
+    "BARCODE_TAKEN": "That barcode is registered to another item.",
+    "BARCODE_DUPLICATED": "That barcode is repeated. Each barcode can belong to one item only.",
+    "PRICE_INVALID": "That price isn't valid. Enter a number with up to 2 decimal places.",
+    "FACTOR_INVALID": "Enter how many units, as a number above zero.",
+    "UNIT_DUPLICATED": "That unit is already added.",
+    "UNIT_NOT_FOUND": "That unit isn't known. Add it first in Catalog setup.",
+    "VARIANT_REQUIRED": "Add at least one variant.",
+    "VARIANT_LABEL_REQUIRED": "Enter a name that tells this variant apart.",
+    "CATEGORY_CYCLE": "A category can't be placed inside itself.",
+    "REFERENCE_IN_USE": "This can't be deleted because {{count}} item(s) use it. Move those items, or archive it instead.",
+    "REFERENCE_IS_SYSTEM": "This is a built-in entry, so it can't be renamed or deleted.",
+    "IMPORT_FILE_INVALID": "Choose an Excel .xlsx file or a .csv file.",
+    "IMPORT_FILE_UNREADABLE": "The file couldn't be read. Make sure it isn't open elsewhere and isn't damaged.",
+    "IMPORT_COLUMNS_MISSING": "The file is missing a column: {{columns}}. Use the ready-made template.",
+    "IMPORT_TOO_MANY_ROWS": "The file is over the limit ({{limit}}). Split it into smaller files.",
+    "IMPORT_EMPTY": "The file has no items in it.",
+    "EXPORT_FAILED": "The file couldn't be saved. Check the location is writable and the file isn't open."
+  },
+  "reference": {
+    "tabs": {
+      "categories": "Categories",
+      "brands": "Brands",
+      "units": "Units",
+      "tax-rates": "Taxes",
+      "price-lists": "Price lists"
+    },
+    "name": "Name",
+    "parent": "Parent category",
+    "noParent": "None",
+    "allowsFraction": "Allows fractions (such as 1.25)",
+    "fraction": "Fractions",
+    "rate": "Rate %",
+    "usage": "Items",
+    "system": "Built-in",
+    "archived": "Archived",
+    "add": "Add",
+    "addTitle": "New entry",
+    "editTitle": "Edit {{name}}",
+    "archive": "Archive",
+    "restore": "Restore",
+    "saved": "Saved",
+    "deleted": "Deleted",
+    "deleteTitle": "Delete {{name}}?",
+    "deleteBody": "This can't be undone.",
+    "emptyTitle": "Nothing here yet",
+    "emptyBody": "Add the first entry, or it will be created when you import items.",
+    "units": {
+      "piece": "Piece",
+      "box": "Box",
+      "strip": "Strip",
+      "carton": "Carton",
+      "bottle": "Bottle",
+      "kilogram": "Kilogram",
+      "gram": "Gram",
+      "liter": "Liter",
+      "meter": "Meter"
+    },
+    "taxes": {
+      "vat": "VAT",
+      "exempt": "Exempt"
+    },
+    "priceLists": {
+      "retail": "Retail price"
+    },
+    "attributes": {
+      "size": "Size",
+      "color": "Color"
+    }
+  },
+  "products": {
+    "add": "Add item",
+    "search": "Search by name, barcode or code",
+    "allCategories": "All categories",
+    "showArchived": "Archived items",
+    "total": "Items: {{value}}",
+    "name": "Item",
+    "sku": "Code",
+    "barcode": "Barcode",
+    "category": "Category",
+    "price": "Price",
+    "variants": "Variants: {{count}}",
+    "emptyTitle": "No items yet",
+    "emptyBody": "Add your first item, or import your list from an Excel file.",
+    "noMatchTitle": "No results",
+    "noMatchBody": "Try another word, or check the selected filter.",
+    "archive": "Archive",
+    "restore": "Restore",
+    "archived": "Archived",
+    "restored": "Restored",
+    "labels": "Print labels",
+    "actions": "Actions for {{name}}",
+    "file": "Import and export",
+    "import": "Import from file",
+    "export": "Export items",
+    "exported": "File saved ({{count}} items)"
+  },
+  "import": {
+    "title": "Import items",
+    "intro": "Choose an Excel or CSV file. The first row must hold column names, and the item name column is required.",
+    "template": "Download a template",
+    "choose": "Choose file",
+    "checking": "Checking the file",
+    "summary": "Rows in the file: {{total}}",
+    "valid": "Valid rows: {{value}}",
+    "invalid": "Rows with errors: {{value}}",
+    "created": "{{categories}} new categories and {{brands}} new brands will be created.",
+    "issuesTitle": "Errors",
+    "issueRow": "Row {{row}}",
+    "moreIssues": "And {{count}} more in the full report.",
+    "saveReport": "Save error report",
+    "reportSaved": "Report saved",
+    "submit": "Import {{count}} items",
+    "done": "Imported {{count}} items",
+    "reportRow": "Row",
+    "reportColumn": "Column",
+    "reportValue": "Value",
+    "reportProblem": "Problem",
+    "columns": {
+      "name": "Item name",
+      "nameEn": "English name",
+      "genericName": "Generic name",
+      "category": "Category",
+      "brand": "Brand",
+      "unit": "Unit",
+      "barcode": "Barcode",
+      "sku": "Item code",
+      "price": "Sale price",
+      "cost": "Cost price"
+    }
+  },
+  "labels": {
+    "title": "Print labels for {{name}}",
+    "noBarcode": "This item has no barcode. Add one first.",
+    "copies": "Copies",
+    "paper": "Paper",
+    "roll": "Label roll 38×25 mm",
+    "sheet": "A4 sheet (grid)",
+    "showPrice": "Show price",
+    "print": "Print",
+    "currency": "EGP"
   }
 }

@@ -35,6 +35,10 @@ const page = <T extends string>(path: string, load: () => Promise<Record<T, () =
 
 const routeTree = rootRoute.addChildren([
   page('/', () => import('../features/home/home-page'), 'HomePage'),
+  page('/products', () => import('../features/catalog/products-page'), 'ProductsPage'),
+  page('/products/new', () => import('../features/catalog/product-form'), 'ProductFormPage'),
+  page('/products/$id', () => import('../features/catalog/product-form'), 'ProductFormPage'),
+  page('/catalog', () => import('../features/catalog/reference-page'), 'ReferencePage'),
   page('/users', () => import('../features/users/users-page'), 'UsersPage'),
   page('/roles', () => import('../features/users/roles-page'), 'RolesPage'),
   page('/audit', () => import('../features/audit/audit-page'), 'AuditPage'),
