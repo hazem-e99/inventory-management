@@ -73,6 +73,12 @@ export const settingsSchema = z.object({
   preferences: preferencesSchema,
   features: featuresSchema,
   stockPolicy: z.object({ allowNegative: z.boolean() }),
+  pos: z.object({
+    warehouseId: z.string(),
+    receiptPaper: z.enum(['80mm', '58mm', 'a4']),
+    printerName: z.string().nullable(),
+    autoPrint: z.boolean(),
+  }),
 })
 
 export type Settings = z.infer<typeof settingsSchema>

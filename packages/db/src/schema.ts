@@ -331,8 +331,159 @@ export interface SerialsTable {
   created_at: number
 }
 
+export interface CustomersTable {
+  id: string
+  name: string
+  phone: string | null
+  address: string | null
+  notes: string | null
+  search_text: string
+  credit_limit_minor: number | null
+  balance_minor: Generated<number>
+  archived_at: number | null
+  created_at: number
+  updated_at: number
+}
+
+export interface CustomerLedgerTable {
+  id: string
+  customer_id: string
+  occurred_at: number
+  business_date: string
+  amount_minor: number
+  balance_after_minor: number
+  source: string
+  document_id: string
+  document_number: string | null
+  reversal_of: string | null
+  actor_id: string | null
+}
+
+export interface ShiftsTable {
+  id: string
+  number: string
+  status: string
+  user_id: string
+  opened_at: number
+  closed_at: number | null
+  closed_by: string | null
+  opening_cash_minor: number
+  expected_cash_minor: number | null
+  counted_cash_minor: number | null
+  notes: string | null
+}
+
+export interface SalesTable {
+  id: string
+  request_id: string
+  kind: string
+  status: string
+  number: string
+  return_of: string | null
+  customer_id: string | null
+  shift_id: string
+  warehouse_id: string
+  gross_minor: number
+  discount_minor: number
+  tax_minor: number
+  total_minor: number
+  tendered_minor: number
+  change_minor: number
+  notes: string | null
+  business_date: string
+  created_by: string | null
+  created_at: number
+  voided_at: number | null
+  voided_by: string | null
+}
+
+export interface SaleLinesTable {
+  id: string
+  sale_id: string
+  position: number
+  variant_id: string
+  unit_id: string
+  item_name: string
+  qty_milli: number
+  base_qty_milli: number
+  unit_price_minor: number
+  discount_minor: number
+  tax_rate_bp: number
+  tax_minor: number
+  total_minor: number
+  cost_minor: number
+  serials: string | null
+  return_of_line: string | null
+  returned_base_milli: Generated<number>
+  refunded_minor: Generated<number>
+  returned_cost_minor: Generated<number>
+}
+
+export interface SaleLineLotsTable {
+  id: string
+  sale_line_id: string
+  lot_id: string | null
+  qty_milli: number
+  returned_milli: Generated<number>
+}
+
+export interface SalePaymentsTable {
+  id: string
+  sale_id: string
+  shift_id: string
+  method: string
+  amount_minor: number
+  reversal_of: string | null
+  occurred_at: number
+}
+
+export interface CustomerReceiptsTable {
+  id: string
+  number: string
+  customer_id: string
+  shift_id: string
+  amount_minor: number
+  method: string
+  reference: string | null
+  notes: string | null
+  status: string
+  created_by: string | null
+  created_at: number
+  voided_at: number | null
+}
+
+export interface CashMovementsTable {
+  id: string
+  shift_id: string
+  kind: string
+  amount_minor: number
+  reason: string | null
+  document_id: string | null
+  actor_id: string | null
+  occurred_at: number
+}
+
+export interface HeldSalesTable {
+  id: string
+  label: string | null
+  cart: string
+  total_minor: number
+  created_by: string | null
+  created_at: number
+}
+
 export interface Database {
   settings: SettingsTable
+  customers: CustomersTable
+  customer_ledger: CustomerLedgerTable
+  shifts: ShiftsTable
+  sales: SalesTable
+  sale_lines: SaleLinesTable
+  sale_line_lots: SaleLineLotsTable
+  sale_payments: SalePaymentsTable
+  customer_receipts: CustomerReceiptsTable
+  cash_movements: CashMovementsTable
+  held_sales: HeldSalesTable
   suppliers: SuppliersTable
   supplier_ledger: SupplierLedgerTable
   purchase_orders: PurchaseOrdersTable

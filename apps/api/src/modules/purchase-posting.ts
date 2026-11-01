@@ -32,8 +32,8 @@ export function purchaseAmounts(lines: ReadonlyArray<Parameters<typeof amountsOf
   return purchaseDocumentTotals(lines.map(amountsOf))
 }
 
-function checkSerialCount(line: PurchaseLine, rule: VariantRule, baseQty: number, index: number): string[] {
-  const serials = parseSerials(line)
+/** A tracked item needs one serial for each piece, whichever document moves it. */
+export function checkSerials(serials: string[], rule: VariantRule, baseQty: number, index: number): string[] {
   if (!rule.trackSerials) return []
 
   if (baseQty % 1000 !== 0 || serials.length !== baseQty / 1000) {
@@ -93,7 +93,7 @@ async function postInvoice(
     const baseQty = baseQuantity(line, rule, index)
     const lotId = await receiptLot(trx, line, rule, index, options)
 
-    const serials = checkSerialCount(line, rule, baseQty, index)
+    const serials = checkSerials(parseSerials(line), rule, baseQty, index)
     if (serials.some((serial) => seen.has(`${line.variant_id}|${serial}`))) {
       throw lineField(index, 'serials', 'SERIAL_DUPLICATED')
     }
@@ -141,7 +141,7 @@ async function postReturn(
     if (Number(line.qty_milli) <= 0) throw lineField(index, 'qtyMilli', 'QUANTITY_INVALID')
     const baseQty = baseQuantity(line, rule, index)
 
-    const serials = checkSerialCount(line, rule, baseQty, index)
+    const serials = checkSerials(parseSerials(line), rule, baseQty, index)
     const existing = await repo.existingSerials(line.variant_id, serials)
     if (existing.length !== serials.length || existing.some(({ status }) => status !== 'in_stock')) {
       throw lineField(index, 'serials', 'SERIAL_NOT_IN_STOCK')

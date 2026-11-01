@@ -18,6 +18,7 @@ function MovementRow({ movement }: { movement: StockMovement }) {
   const format = useFormat()
   const incoming = movement.qtyMilli > 0
   const purchased = movement.documentKind === 'purchase' || movement.documentKind === 'purchase_return'
+  const sold = movement.documentKind === 'sale' || movement.documentKind === 'sale_return'
 
   return (
     <div role="row" className={`${COLUMNS} h-full border-b border-rule text-sm hover:bg-ground`}>
@@ -26,7 +27,7 @@ function MovementRow({ movement }: { movement: StockMovement }) {
       </div>
       <div role="cell" className="truncate">
         <Link
-          to={purchased ? '/purchases/$id' : '/stock/$id'}
+          to={purchased ? '/purchases/$id' : sold ? '/sales/$id' : '/stock/$id'}
           params={{ id: movement.documentId }}
           className="text-ink hover:text-route"
         >

@@ -1,9 +1,11 @@
 import {
   featuresSchema,
+  posSettingsSchema,
   preferencesSchema,
   stockPolicySchema,
   storeSchema,
   type Features,
+  type PosSettings,
   type Preferences,
   type StockPolicy,
   type Store,
@@ -17,9 +19,11 @@ const KEYS = {
   preferences: 'preferences',
   recovery: 'recovery',
   stockPolicy: 'stock_policy',
+  pos: 'pos',
 } as const
 
 const DEFAULT_PREFERENCES: Preferences = { locale: 'ar', theme: 'system', digits: 'latin' }
+const DEFAULT_POS: PosSettings = { warehouseId: 'main', receiptPaper: '80mm', printerName: null, autoPrint: false }
 
 /** Typed access to the settings rows. Reads are validated, since these outlive app versions. */
 export function storeSettings(db: Kysely<Database>) {
@@ -55,6 +59,13 @@ export function storeSettings(db: Kysely<Database>) {
 
     setStockPolicy: (policy: StockPolicy, now: number) =>
       settings.setJson(KEYS.stockPolicy, policy, now),
+
+    async pos(): Promise<PosSettings> {
+      const value = await settings.getJson(KEYS.pos)
+      return value === null ? DEFAULT_POS : posSettingsSchema.parse(value)
+    },
+
+    setPos: (pos: PosSettings, now: number) => settings.setJson(KEYS.pos, pos, now),
 
     recovery: () => settings.getJson<KeyEnvelope>(KEYS.recovery),
 

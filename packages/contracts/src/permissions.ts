@@ -17,6 +17,15 @@ export const PERMISSIONS = [
   'purchases.void',
   'suppliers.manage',
   'suppliers.pay',
+  'sales.view',
+  'sales.sell',
+  'sales.discount',
+  'sales.price',
+  'sales.return',
+  'sales.void',
+  'customers.manage',
+  'customers.collect',
+  'shifts.manage',
 ] as const
 
 export type Permission = (typeof PERMISSIONS)[number]

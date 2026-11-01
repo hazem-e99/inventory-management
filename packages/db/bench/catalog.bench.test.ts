@@ -5,15 +5,17 @@ import { join } from 'node:path'
 import { buildSearchText, searchTerms } from '@inv/domain'
 import { sql, type Kysely } from 'kysely'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { catalogRepo, createSqliteDb, migrateToLatest, type Database } from '../src'
+import { catalogRepo, createSqliteDb, migrateToLatest, salesRepo, stockLedger, type Database } from '../src'
 
 const PRODUCTS = 100_000
+const MOVEMENTS = 1_000_000
 const BATCH = 500
 const RUNS = 40
 
 // From docs/PLAN.md, section 8. Measured on a fast PC, so these leave room for a weak one.
 const SEARCH_BUDGET_MS = 150
 const PAGE_BUDGET_MS = 150
+const SCAN_BUDGET_MS = 100
 
 const NAMES = ['باراسيتامول', 'أموكسيسيلين', 'فيتامين سي', 'بنادول', 'كونجستال', 'حليب', 'سكر', 'زيت', 'أرز', 'شاي']
 
@@ -82,6 +84,17 @@ async function seed(): Promise<void> {
         await sql`insert into product_search (product_id, text) values (${`p${index}`}, ${text(index)})`.execute(trx)
       }
     }
+
+    // A year or two of a busy shop's history, so posting is measured against a full ledger.
+    // Written in index order: at random, six indexes on an encrypted file would take hours.
+    await sql`
+      with recursive counter(n) as (select 1 union all select n + 1 from counter where n < ${MOVEMENTS / PRODUCTS})
+      insert into stock_movements
+        (id, occurred_at, business_date, variant_id, warehouse_id, qty_milli, value_minor, document_id, document_type)
+      select variant.id || '-' || printf('%02d', n), n, '2026-01-01', variant.id, 'main', 1000, 100, variant.id || '-' || printf('%02d', n), 'adjustment'
+      from product_variants as variant cross join counter
+      order by variant.id, n
+    `.execute(trx)
   })
 }
 
@@ -95,12 +108,12 @@ async function p95(run: () => Promise<unknown>): Promise<number> {
   return samples.sort((a, b) => a - b)[Math.floor(RUNS * 0.95)]!
 }
 
-describe(`catalog with ${PRODUCTS} products`, () => {
+describe(`catalog with ${PRODUCTS} products and ${MOVEMENTS} movements`, () => {
   beforeAll(async () => {
     db = createSqliteDb({ path: join(dir, 'bench.db'), hexKey: randomBytes(32).toString('hex') })
     await migrateToLatest(db)
     await seed()
-  }, 300_000)
+  }, 900_000)
 
   afterAll(async () => {
     await db.destroy()
@@ -119,6 +132,24 @@ describe(`catalog with ${PRODUCTS} products`, () => {
     ['search matching 1 item', () => list('صنف77777'), SEARCH_BUDGET_MS],
     ['search by barcode', () => list('62277777'), SEARCH_BUDGET_MS],
     ['filter by category', () => catalogRepo(db).listProducts({ terms: [], categoryId: 'c7', archived: false, limit: 50 }), PAGE_BUDGET_MS],
+    ['scan at the till', () => salesRepo(db).posLookup('62277777', 'main'), SCAN_BUDGET_MS],
+    ['search at the till', () => salesRepo(db).posLookup('صنف77777', 'main'), SEARCH_BUDGET_MS],
+    [
+      'post a sale line',
+      () =>
+        db.transaction().execute((trx) =>
+          stockLedger(trx, {
+            documentId: 'bench',
+            documentType: 'sale',
+            documentNumber: null,
+            actorId: null,
+            occurredAt: 1,
+            businessDate: '2026-01-01',
+            allowNegative: true,
+          }).post({ variantId: 'v77777', warehouseId: 'main', lotId: null, qtyMilli: -1000 }),
+        ),
+      SCAN_BUDGET_MS,
+    ],
   ]
 
   it.each(cases)('%s', async (name, run, budget) => {

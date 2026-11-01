@@ -1,13 +1,13 @@
 import type { Bootstrap, Permission } from '@inv/contracts'
 import { Button, Menu, MenuItem, MenuLabel, MenuSeparator, Station } from '@inv/ui'
 import { Link, Outlet, useRouterState } from '@tanstack/react-router'
-import { Archive, ChevronsUpDown, ClipboardList, FileClock, History, Home, KeyRound, LockKeyhole, LogOut, Package, ReceiptText, Settings, ShieldCheck, Tags, Truck, Users } from 'lucide-react'
+import { Archive, ChevronsUpDown, ClipboardList, Contact, FileClock, History, Home, KeyRound, LockKeyhole, LogOut, Package, Receipt, ReceiptText, ScanBarcode, Settings, ShieldCheck, Tags, Timer, Truck, Users } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AccountDialogs, type AccountPanel } from '../features/auth/account-dialogs'
 import { useActor, useSession } from '../lib/session'
 
-type NavKey = 'home' | 'products' | 'stock' | 'purchases' | 'orders' | 'suppliers' | 'catalog' | 'users' | 'roles' | 'audit' | 'backups' | 'settings'
+type NavKey = 'home' | 'pos' | 'sales' | 'customers' | 'shifts' | 'products' | 'stock' | 'purchases' | 'orders' | 'suppliers' | 'catalog' | 'users' | 'roles' | 'audit' | 'backups' | 'settings'
 
 interface NavItem {
   key: NavKey
@@ -18,6 +18,10 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { key: 'home', to: '/', icon: <Home /> },
+  { key: 'pos', to: '/pos', icon: <ScanBarcode />, permission: 'sales.sell' },
+  { key: 'sales', to: '/sales', icon: <Receipt />, permission: 'sales.view' },
+  { key: 'customers', to: '/customers', icon: <Contact />, permission: 'sales.view' },
+  { key: 'shifts', to: '/shifts', icon: <Timer />, permission: 'sales.view' },
   { key: 'products', to: '/products', icon: <Package />, permission: 'catalog.view' },
   { key: 'stock', to: '/stock', icon: <ClipboardList />, permission: 'stock.view' },
   { key: 'purchases', to: '/purchases', icon: <ReceiptText />, permission: 'purchases.view' },
@@ -111,7 +115,7 @@ export function Shell({ bootstrap }: { bootstrap: Bootstrap }) {
       </aside>
 
       <main className="min-h-0 overflow-y-auto">
-        <div className="mx-auto flex h-full max-w-6xl flex-col p-8">
+        <div className={pathname === '/pos' ? 'h-full' : 'mx-auto flex h-full max-w-6xl flex-col p-8'}>
           <Outlet />
         </div>
       </main>

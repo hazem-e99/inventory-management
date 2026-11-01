@@ -1,27 +1,33 @@
 import {
   DIGIT_STYLES,
   LOCALES,
+  RECEIPT_PAPERS,
+  posSettingsSchema,
   stockPolicySchema,
   storeSchema,
   THEMES,
   updateStoreSchema,
+  type PosSettings,
+  type ReceiptPaper,
   type Settings,
   type UpdateStoreInput,
 } from '@inv/contracts'
-import { cn, FormSkeleton, Sign } from '@inv/ui'
+import { cn, Field, FormSkeleton, Select, Sign } from '@inv/ui'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { RadioGroup } from 'radix-ui'
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { SubmitButton, TextField, UnsavedGuard } from '../../components/form'
 import { QueryBoundary } from '../../components/states'
 import { api } from '../../lib/api'
+import { desktop } from '../../lib/desktop'
 import { useReportError } from '../../lib/errors'
 import { usePreferences } from '../../lib/preferences'
 import { useCan } from '../../lib/session'
+import { referenceQuery, useReferenceName } from '../catalog/queries'
 import { settingsQuery } from './queries'
 
 function Segmented<T extends string>({
@@ -205,6 +211,85 @@ function StockPolicySection({ settings }: { settings: Settings }) {
   )
 }
 
+function PosSection({ settings }: { settings: Settings }) {
+  const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const report = useReportError()
+  const warehouseName = useReferenceName('warehouses')
+  const warehouseId = useId()
+  const paperId = useId()
+  const printerId = useId()
+  const warehouses = useQuery(referenceQuery('warehouses'))
+  const printers = useQuery({ queryKey: ['printers'], queryFn: () => desktop().listPrinters() })
+  const current = settings.pos
+
+  const update = useMutation({
+    mutationFn: (changes: Partial<PosSettings>) =>
+      api(posSettingsSchema, 'PUT', '/settings/pos', { body: { ...current, ...changes } }),
+    onSuccess: () => {
+      toast.success(t('settings.posSaved'))
+      return queryClient.invalidateQueries({ queryKey: ['settings'] })
+    },
+    onError: report,
+  })
+
+  return (
+    <section className="flex flex-col gap-3">
+      <h2 className="text-lg font-semibold text-ink">{t('settings.posTitle')}</h2>
+      <div className="grid max-w-3xl grid-cols-3 gap-4">
+        <Field id={warehouseId} label={t('settings.posWarehouse')}>
+          <Select id={warehouseId} value={current.warehouseId} onChange={(event) => update.mutate({ warehouseId: event.target.value })}>
+            {warehouses.data?.items
+              .filter((row) => !row.archived)
+              .map((row) => (
+                <option key={row.id} value={row.id}>
+                  {warehouseName(row)}
+                </option>
+              ))}
+          </Select>
+        </Field>
+        <Field id={paperId} label={t('settings.posPaper')}>
+          <Select
+            id={paperId}
+            value={current.receiptPaper}
+            onChange={(event) => update.mutate({ receiptPaper: event.target.value as ReceiptPaper })}
+          >
+            {RECEIPT_PAPERS.map((paper) => (
+              <option key={paper} value={paper}>
+                {t(`settings.posPapers.${paper}`)}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field id={printerId} label={t('settings.posPrinter')}>
+          <Select
+            id={printerId}
+            value={current.printerName ?? ''}
+            onChange={(event) => update.mutate({ printerName: event.target.value || null })}
+          >
+            <option value="">{t('settings.posPrinterAsk')}</option>
+            {printers.data?.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      </div>
+      <label className="flex cursor-pointer items-center gap-3">
+        <input
+          type="checkbox"
+          className="size-4 accent-route"
+          checked={current.autoPrint}
+          disabled={update.isPending}
+          onChange={(event) => update.mutate({ autoPrint: event.target.checked })}
+        />
+        <span className="font-medium text-ink">{t('settings.posAutoPrint')}</span>
+      </label>
+    </section>
+  )
+}
+
 export function SettingsPage() {
   const { t } = useTranslation()
   const query = useQuery(settingsQuery)
@@ -219,6 +304,7 @@ export function SettingsPage() {
           <>
             <StoreSection key={settings.store.name} settings={settings} />
             {canManage && <StockPolicySection settings={settings} />}
+            {canManage && <PosSection settings={settings} />}
           </>
         )}
       </QueryBoundary>

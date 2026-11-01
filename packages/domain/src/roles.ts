@@ -20,6 +20,15 @@ export const SYSTEM_ROLE_DEFAULTS: Record<SystemRole, readonly Permission[]> = {
     'purchases.void',
     'suppliers.manage',
     'suppliers.pay',
+    'sales.view',
+    'sales.sell',
+    'sales.discount',
+    'sales.price',
+    'sales.return',
+    'sales.void',
+    'customers.manage',
+    'customers.collect',
+    'shifts.manage',
   ],
   storekeeper: [
     'catalog.view',
@@ -30,7 +39,7 @@ export const SYSTEM_ROLE_DEFAULTS: Record<SystemRole, readonly Permission[]> = {
     'purchases.view',
     'purchases.manage',
   ],
-  cashier: ['catalog.view', 'stock.view'],
+  cashier: ['catalog.view', 'stock.view', 'sales.view', 'sales.sell', 'sales.return', 'customers.collect'],
 }
 
 export function effectivePermissions(roleId: string, stored: readonly Permission[]): Permission[] {

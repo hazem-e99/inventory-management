@@ -183,6 +183,31 @@ function registerIpc(): void {
     return result.canceled ? null : (result.filePath ?? null)
   })
 
+  handle('print:printers', async (event) => {
+    const printers = await event.sender.getPrintersAsync()
+    return printers.map(({ name }) => name)
+  })
+
+  // A chosen printer prints silently, so a cashier never meets a dialog with a customer waiting.
+  handle(
+    'print:run',
+    (event, job: { deviceName: string | null; widthMm: number | null; heightMm: number | null }) =>
+      new Promise<{ ok: boolean }>((resolve) => {
+        event.sender.print(
+          {
+            silent: job.deviceName !== null,
+            printBackground: true,
+            margins: { marginType: 'none' },
+            ...(job.deviceName ? { deviceName: job.deviceName } : {}),
+            ...(job.widthMm && job.heightMm
+              ? { pageSize: { width: Math.round(job.widthMm * 1000), height: Math.round(job.heightMm * 1000) } }
+              : {}),
+          },
+          (success) => resolve({ ok: success }),
+        )
+      }),
+  )
+
   handle(
     'backup:restore',
     async (event, input: { path: string; recoveryCode: string }) => {

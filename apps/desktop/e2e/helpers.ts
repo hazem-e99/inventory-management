@@ -112,9 +112,11 @@ export async function importProduct(app: ElectronApplication, page: Page, direct
 }
 
 /** Types the code and presses Enter, exactly as a keyboard-wedge scanner does. */
-export async function scan(page: Page): Promise<void> {
+export async function scanCode(page: Page, code: string): Promise<void> {
   const picker = page.getByRole('searchbox', { name: /امسح الباركود/ })
-  await picker.fill(BARCODE)
+  await picker.fill(code)
   await picker.press('Enter')
   await expect(picker).toHaveValue('')
 }
+
+export const scan = (page: Page): Promise<void> => scanCode(page, BARCODE)

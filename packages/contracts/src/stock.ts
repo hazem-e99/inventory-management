@@ -163,7 +163,7 @@ export const productStockSchema = z.object({
 
 export type ProductStock = z.infer<typeof productStockSchema>
 
-export const MOVEMENT_SOURCES = [...STOCK_DOCUMENT_KINDS, 'purchase', 'purchase_return'] as const
+export const MOVEMENT_SOURCES = [...STOCK_DOCUMENT_KINDS, 'purchase', 'purchase_return', 'sale', 'sale_return'] as const
 export type MovementSource = (typeof MOVEMENT_SOURCES)[number]
 
 export const stockMovementSchema = z.object({

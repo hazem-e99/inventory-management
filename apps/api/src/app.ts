@@ -9,12 +9,15 @@ import { auditRoutes } from './modules/audit'
 import { authRoutes } from './modules/auth'
 import { backupRoutes } from './modules/backups'
 import { catalogFileRoutes } from './modules/catalog-import'
+import { customerRoutes } from './modules/customers'
 import { onboardingRoutes } from './modules/onboarding'
 import { productRoutes } from './modules/products'
 import { purchaseRoutes } from './modules/purchases'
 import { referenceRoutes } from './modules/reference'
 import { rolesRoutes } from './modules/roles'
+import { saleRoutes } from './modules/sales'
 import { settingsRoutes } from './modules/settings'
+import { shiftRoutes } from './modules/shifts'
 import { stockRoutes } from './modules/stock'
 import { supplierRoutes } from './modules/suppliers'
 import { usersRoutes } from './modules/users'
@@ -79,6 +82,9 @@ export function createApp(deps: AppDeps) {
   app.route('/', referenceRoutes(deps))
   app.route('/', supplierRoutes(deps))
   app.route('/', purchaseRoutes(deps))
+  app.route('/', saleRoutes(deps))
+  app.route('/', shiftRoutes(deps))
+  app.route('/', customerRoutes(deps))
 
   app.doc('/openapi.json', {
     openapi: '3.1.0',

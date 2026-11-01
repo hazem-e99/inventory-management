@@ -6,6 +6,13 @@ export type Startup =
 
 export type RestoreResult = { ok: true } | { ok: false; code: ErrorCode }
 
+export interface PrintJob {
+  deviceName: string | null
+  /** Set for a roll, whose page is exactly as long as the receipt. */
+  widthMm: number | null
+  heightMm: number | null
+}
+
 declare global {
   interface Window {
     desktop: {
@@ -14,6 +21,8 @@ declare global {
       chooseBackupDestination(defaultName: string): Promise<string | null>
       chooseCatalogFile(): Promise<string | null>
       chooseSpreadsheetDestination(defaultName: string): Promise<string | null>
+      listPrinters(): Promise<string[]>
+      print(job: PrintJob): Promise<{ ok: boolean }>
       restoreBackup(input: { path: string; recoveryCode: string }): Promise<RestoreResult>
     }
   }

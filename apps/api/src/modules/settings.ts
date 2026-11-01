@@ -1,5 +1,5 @@
 import { createRoute } from '@hono/zod-openapi'
-import { preferencesSchema, settingsSchema, stockPolicySchema, storeSchema, updateStoreSchema } from '@inv/contracts'
+import { posSettingsSchema, preferencesSchema, settingsSchema, stockPolicySchema, storeSchema, updateStoreSchema } from '@inv/contracts'
 import { auditRepo } from '@inv/db'
 import type { AppDeps } from '../http/context'
 import { AppError } from '../http/errors'
@@ -41,6 +41,14 @@ export function settingsRoutes(deps: AppDeps) {
     responses: { 200: jsonOk(stockPolicySchema) },
   })
 
+  const updatePosRoute = createRoute({
+    method: 'put',
+    path: '/settings/pos',
+    middleware: [...guard, requirePermission('settings.manage')],
+    request: { body: jsonBody(posSettingsSchema) },
+    responses: { 200: jsonOk(posSettingsSchema) },
+  })
+
   return router()
     .openapi(readRoute, async (c) => {
       const settings = storeSettings(deps.db)
@@ -52,6 +60,7 @@ export function settingsRoutes(deps: AppDeps) {
           preferences: await settings.preferences(),
           features: await settings.features(),
           stockPolicy: await settings.stockPolicy(),
+          pos: await settings.pos(),
         },
         200,
       )
@@ -93,6 +102,11 @@ export function settingsRoutes(deps: AppDeps) {
         occurredAt: now,
       })
       return c.json(policy, 200)
+    })
+    .openapi(updatePosRoute, async (c) => {
+      const pos = c.req.valid('json')
+      await storeSettings(deps.db).setPos(pos, deps.clock())
+      return c.json(pos, 200)
     })
     .openapi(updatePreferencesRoute, async (c) => {
       const preferences = c.req.valid('json')
