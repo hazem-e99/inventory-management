@@ -42,7 +42,9 @@
     "addVariant": "إضافة نوع",
     "removeVariant": "حذف النوع",
     "saved": "تم حفظ الصنف",
-    "save": "حفظ الصنف"
+    "save": "حفظ الصنف",
+    "reorderLevel": "حد إعادة الطلب",
+    "reorderHint": "ينبهك البرنامج عند الوصول لهذه الكمية."
   },
   "common": {
     "add": "إضافة",
@@ -133,6 +135,10 @@
     "shifts": {
       "label": "الورديات",
       "other": "Shifts"
+    },
+    "reports": {
+      "label": "التقارير",
+      "other": "Reports"
     }
   },
   "account": {
@@ -319,7 +325,9 @@
     "sales.void": "إلغاء فواتير البيع",
     "customers.manage": "إدارة العملاء",
     "customers.collect": "تحصيل مدفوعات العملاء",
-    "shifts.manage": "إغلاق ورديات الآخرين"
+    "shifts.manage": "إغلاق ورديات الآخرين",
+    "reports.view": "عرض التقارير",
+    "reports.profit": "عرض التكلفة والربح وقيمة المخزون"
   },
   "audit": {
     "time": "الوقت",
@@ -372,7 +380,8 @@
       "shift.cash_moved": "حركة نقدية في الوردية",
       "customer.created": "إضافة عميل",
       "customer.collected": "تحصيل من عميل",
-      "customer.receipt_voided": "إلغاء إيصال عميل"
+      "customer.receipt_voided": "إلغاء إيصال عميل",
+      "report.exported": "تصدير تقرير"
     }
   },
   "backups": {
@@ -1213,5 +1222,118 @@
     "change": "الباقي",
     "thanks": "شكراً لزيارتكم",
     "returnOf": "مرتجع من"
+  },
+  "reports": {
+    "groups": {
+      "sales": "المبيعات",
+      "stock": "المخزون",
+      "accounts": "الحسابات"
+    },
+    "titles": {
+      "sales": "المبيعات اليومية",
+      "items": "ربحية الأصناف",
+      "inventory": "قيمة المخزون",
+      "movements": "حركة المخزون",
+      "reorder": "نواقص وطلبات شراء",
+      "expiry": "قرب انتهاء الصلاحية",
+      "dead": "المخزون الراكد",
+      "suppliers": "حسابات الموردين",
+      "customers": "حسابات العملاء",
+      "shifts": "تقرير الورديات"
+    },
+    "descriptions": {
+      "sales": "المبيعات والمرتجعات والربح لكل يوم.",
+      "items": "ما بيع من كل صنف وربحه، مع تصنيف ABC.",
+      "inventory": "الرصيد الحالي وقيمته بالتكلفة.",
+      "movements": "كل حركة دخلت أو خرجت من المخزون.",
+      "reorder": "الأصناف عند حد الطلب أو تحته، والكمية المقترحة.",
+      "expiry": "الدُفعات المنتهية والتي قاربت الانتهاء.",
+      "dead": "أصناف في المخزون لم تُبع منذ فترة.",
+      "suppliers": "المشتريات والمدفوعات والرصيد لكل مورد.",
+      "customers": "البيع الآجل والتحصيل والرصيد لكل عميل.",
+      "shifts": "مبيعات كل وردية وفرق الدرج."
+    },
+    "columns": {
+      "date": "التاريخ",
+      "salesCount": "الفواتير",
+      "returnsCount": "المرتجعات",
+      "salesMinor": "المبيعات",
+      "returnsMinor": "المرتجعات",
+      "netMinor": "الصافي",
+      "discountMinor": "الخصومات",
+      "taxMinor": "الضريبة",
+      "costMinor": "التكلفة",
+      "profitMinor": "الربح",
+      "name": "الصنف",
+      "sku": "الكود",
+      "qtyMilli": "الكمية",
+      "abc": "الفئة",
+      "category": "التصنيف",
+      "onHandMilli": "الرصيد",
+      "averageCostMinor": "متوسط التكلفة",
+      "valueMinor": "القيمة",
+      "occurredAt": "الوقت",
+      "warehouse": "المخزن",
+      "lotNo": "الدُفعة",
+      "kind": "النوع",
+      "documentNumber": "المستند",
+      "levelMilli": "حد الطلب",
+      "soldLastMonthMilli": "مبيعات 30 يوماً",
+      "suggestedMilli": "المقترح",
+      "supplier": "آخر مورد",
+      "expiryDate": "الصلاحية",
+      "daysLeft": "الأيام المتبقية",
+      "lastSoldOn": "آخر بيع",
+      "purchasesMinor": "المشتريات",
+      "paidMinor": "المدفوع",
+      "balanceMinor": "الرصيد",
+      "partyName": "الاسم",
+      "collectedMinor": "المحصل",
+      "number": "الرقم",
+      "cashier": "الكاشير",
+      "openedAt": "الفتح",
+      "expectedCashMinor": "المتوقع",
+      "countedCashMinor": "الفعلي",
+      "differenceMinor": "الفرق"
+    },
+    "from": "من",
+    "to": "إلى",
+    "days": "عدد الأيام",
+    "period": "الفترة",
+    "periods": {
+      "today": "اليوم",
+      "week": "آخر 7 أيام",
+      "month": "آخر 30 يوماً",
+      "quarter": "آخر 90 يوماً",
+      "year": "آخر سنة",
+      "custom": "فترة محددة"
+    },
+    "totals": "الإجمالي",
+    "emptyTitle": "لا توجد بيانات في هذه الفترة",
+    "emptyBody": "غيّر الفترة، أو سجل حركات ليظهر التقرير.",
+    "emptyPlain": "لا يوجد شيء لعرضه الآن.",
+    "exportExcel": "Excel",
+    "exportPdf": "PDF",
+    "exported": "تم حفظ {{rows}} صف",
+    "pdfSaved": "تم حفظ ملف PDF",
+    "pdfLimit": "يتضمن أول {{rows}} صف. استخدم Excel للتقرير كاملاً.",
+    "printedAt": "طُبع في {{date}}",
+    "createOrder": "أمر شراء بالمقترح",
+    "dashboard": {
+      "title": "اليوم",
+      "net": "صافي مبيعات اليوم",
+      "invoices": "الفواتير",
+      "returns": "المرتجعات",
+      "profit": "الربح",
+      "trend": "صافي المبيعات، آخر 14 يوماً",
+      "alerts": "يحتاج انتباهك",
+      "alertsClear": "لا يوجد ما يحتاج انتباهك.",
+      "lowStock": "أصناف عند حد الطلب",
+      "nearExpiry": "دفعات قاربت الانتهاء",
+      "expired": "دفعات منتهية في المخزون",
+      "allReports": "كل التقارير",
+      "day": "اليوم",
+      "amount": "الصافي"
+    }
   }
 }

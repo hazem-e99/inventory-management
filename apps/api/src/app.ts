@@ -14,6 +14,7 @@ import { onboardingRoutes } from './modules/onboarding'
 import { productRoutes } from './modules/products'
 import { purchaseRoutes } from './modules/purchases'
 import { referenceRoutes } from './modules/reference'
+import { reportRoutes } from './modules/reports'
 import { rolesRoutes } from './modules/roles'
 import { saleRoutes } from './modules/sales'
 import { settingsRoutes } from './modules/settings'
@@ -85,6 +86,7 @@ export function createApp(deps: AppDeps) {
   app.route('/', saleRoutes(deps))
   app.route('/', shiftRoutes(deps))
   app.route('/', customerRoutes(deps))
+  app.route('/', reportRoutes(deps))
 
   app.doc('/openapi.json', {
     openapi: '3.1.0',

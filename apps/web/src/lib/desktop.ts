@@ -23,6 +23,7 @@ declare global {
       chooseSpreadsheetDestination(defaultName: string): Promise<string | null>
       listPrinters(): Promise<string[]>
       print(job: PrintJob): Promise<{ ok: boolean }>
+      savePdf(job: { defaultName: string; landscape: boolean }): Promise<{ saved: boolean }>
       restoreBackup(input: { path: string; recoveryCode: string }): Promise<RestoreResult>
     }
   }

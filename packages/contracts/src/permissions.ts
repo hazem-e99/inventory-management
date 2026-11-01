@@ -26,6 +26,8 @@ export const PERMISSIONS = [
   'customers.manage',
   'customers.collect',
   'shifts.manage',
+  'reports.view',
+  'reports.profit',
 ] as const
 
 export type Permission = (typeof PERMISSIONS)[number]

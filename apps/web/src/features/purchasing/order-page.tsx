@@ -12,7 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { PackageCheck, Trash2 } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useFieldArray, useForm, useWatch, type UseFormReturn } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -25,6 +25,7 @@ import { useFormat } from '../../lib/format'
 import { useCan } from '../../lib/session'
 import { referenceQuery, useReferenceName } from '../catalog/queries'
 import { ItemPicker } from '../stock/item-picker'
+import { clearOrderDraft, peekOrderDraft, type OrderDraftLine } from './order-draft'
 import { SupplierPicker } from './supplier-picker'
 
 const lineSchema = z.object({
@@ -51,8 +52,27 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 type OrderForm = UseFormReturn<FormValues>
 
-function toValues(order: Order | null): FormValues {
-  if (!order) return { supplierId: '', supplierName: '', warehouseId: 'main', expectedDate: '', notes: '', lines: [] }
+function toValues(order: Order | null, draft: readonly OrderDraftLine[] = []): FormValues {
+  if (!order) {
+    return {
+      supplierId: '',
+      supplierName: '',
+      warehouseId: 'main',
+      expectedDate: '',
+      notes: '',
+      lines: draft.map((line) => ({
+        variantId: line.variantId,
+        productName: line.name,
+        variantLabel: '',
+        baseUnitId: line.baseUnitId,
+        unitId: line.baseUnitId,
+        qty: quantityToText(line.qtyMilli),
+        cost: moneyToText(line.costMinor),
+        orderedBaseMilli: 0,
+        receivedBaseMilli: 0,
+      })),
+    }
+  }
 
   return {
     supplierId: order.supplierId,
@@ -176,7 +196,17 @@ const CONFIRM_TEXT = {
   delete: { title: 'orders.deleteTitle', body: 'orders.deleteBody', action: 'orders.deleteDraft' },
 } as const
 
-function OrderEditor({ order, warehouses, units }: { order: Order | null; warehouses: Reference[]; units: Reference[] }) {
+function OrderEditor({
+  order,
+  draft,
+  warehouses,
+  units,
+}: {
+  order: Order | null
+  draft: readonly OrderDraftLine[]
+  warehouses: Reference[]
+  units: Reference[]
+}) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -190,7 +220,7 @@ function OrderEditor({ order, warehouses, units }: { order: Order | null; wareho
   // Survives a failed open: the retry must update the same draft, not create a second one.
   const savedId = useRef(order?.id ?? null)
 
-  const form = useForm<FormValues>({ resolver: zodResolver(formSchema), defaultValues: toValues(order) })
+  const form = useForm<FormValues>({ resolver: zodResolver(formSchema), defaultValues: toValues(order, draft) })
   const lines = useFieldArray({ control: form.control, name: 'lines' })
   const report = useReportError(form, mapFieldPath)
   const warehouseId = useWatch({ control: form.control, name: 'warehouseId' })
@@ -441,6 +471,8 @@ function OrderEditor({ order, warehouses, units }: { order: Order | null; wareho
 export function OrderPage() {
   const { t } = useTranslation()
   const { id } = useParams({ strict: false })
+  const [draft] = useState(peekOrderDraft)
+  useEffect(clearOrderDraft, [])
 
   const order = useQuery({
     queryKey: ['purchases', 'order', id],
@@ -469,6 +501,7 @@ export function OrderPage() {
         <OrderEditor
           key={order.data ? `${order.data.id}-${order.data.status}` : 'new'}
           order={order.data ?? null}
+          draft={draft}
           warehouses={warehouses.data!.items}
           units={units.data!.items}
         />

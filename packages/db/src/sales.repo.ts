@@ -161,6 +161,10 @@ export function salesRepo(db: Kysely<Database>) {
       return db.updateTable('sale_lines').set(changes).where('id', '=', id).execute()
     },
 
+    dropFromReports(saleId: string) {
+      return db.updateTable('sale_lines').set({ report_date: null }).where('sale_id', '=', saleId).execute()
+    },
+
     insertLineLot(lot: Insertable<SaleLineLotsTable>) {
       return db.insertInto('sale_line_lots').values(lot).execute()
     },

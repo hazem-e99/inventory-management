@@ -207,6 +207,7 @@ export async function postSale(trx: Kysely<Database>, input: CheckoutInput, cont
     voided_by: null,
   })
 
+  let totalCost = 0
   for (const [index, line] of lines.entries()) {
     const rule = rules.get(line.variantId)!
     const baseQty = bases[index]!
@@ -231,11 +232,14 @@ export async function postSale(trx: Kysely<Database>, input: CheckoutInput, cont
       cost_minor: 0,
       serials: serials.length > 0 ? JSON.stringify(serials) : null,
       return_of_line: null,
+      report_date: context.today,
     })
     const cost = await issueLine(trx, line, rule, baseQty, index, lineId, ledger, context)
     await sales.updateLine(lineId, { cost_minor: cost })
     await markSerialsSold(trx, line, serials, index)
+    totalCost += cost
   }
+  await sales.updateSale(saleId, { cost_minor: totalCost })
 
   const kept = { cash: settlement.cashKeptMinor } as Record<string, number>
   for (const { method, amountMinor } of tenders) {
@@ -351,6 +355,7 @@ export async function postReturn(trx: Kysely<Database>, sale: SaleRecord, input:
   const seen = new Set<string>()
   let refund = 0
   let tax = 0
+  let cost = 0
 
   for (const [index, requested] of input.lines.entries()) {
     const line = soldLines.find(({ id }) => id === requested.saleLineId)
@@ -388,6 +393,8 @@ export async function postReturn(trx: Kysely<Database>, sale: SaleRecord, input:
       cost_minor: costShare,
       serials: serials.length > 0 ? JSON.stringify(serials) : null,
       return_of_line: line.id,
+      report_date: context.today,
+      is_return: 1,
     })
     await restockLine(trx, line, returnLineId, baseQty, costShare, sale.warehouse_id, ledger)
     await sales.updateLine(line.id, {
@@ -398,9 +405,10 @@ export async function postReturn(trx: Kysely<Database>, sale: SaleRecord, input:
 
     refund += lineRefund
     tax += taxShare
+    cost += costShare
   }
 
-  await sales.updateSale(returnId, { gross_minor: refund, tax_minor: tax, total_minor: refund })
+  await sales.updateSale(returnId, { gross_minor: refund, tax_minor: tax, total_minor: refund, cost_minor: cost })
   if (refund > 0) {
     await sales.insertPayment({
       sale_id: returnId,
@@ -486,4 +494,5 @@ export async function voidSale(trx: Kysely<Database>, sale: SaleRecord, context:
     })
   }
   await sales.updateSale(sale.id, { status: 'voided', voided_at: context.now, voided_by: context.actor.id })
+  await sales.dropFromReports(sale.id)
 }

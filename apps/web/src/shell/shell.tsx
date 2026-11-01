@@ -1,13 +1,13 @@
 import type { Bootstrap, Permission } from '@inv/contracts'
 import { Button, Menu, MenuItem, MenuLabel, MenuSeparator, Station } from '@inv/ui'
 import { Link, Outlet, useRouterState } from '@tanstack/react-router'
-import { Archive, ChevronsUpDown, ClipboardList, Contact, FileClock, History, Home, KeyRound, LockKeyhole, LogOut, Package, Receipt, ReceiptText, ScanBarcode, Settings, ShieldCheck, Tags, Timer, Truck, Users } from 'lucide-react'
+import { Archive, ChartColumn, ChevronsUpDown, ClipboardList, Contact, FileClock, History, Home, KeyRound, LockKeyhole, LogOut, Package, Receipt, ReceiptText, ScanBarcode, Settings, ShieldCheck, Tags, Timer, Truck, Users } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AccountDialogs, type AccountPanel } from '../features/auth/account-dialogs'
 import { useActor, useSession } from '../lib/session'
 
-type NavKey = 'home' | 'pos' | 'sales' | 'customers' | 'shifts' | 'products' | 'stock' | 'purchases' | 'orders' | 'suppliers' | 'catalog' | 'users' | 'roles' | 'audit' | 'backups' | 'settings'
+type NavKey = 'home' | 'pos' | 'sales' | 'customers' | 'shifts' | 'reports' | 'products' | 'stock' | 'purchases' | 'orders' | 'suppliers' | 'catalog' | 'users' | 'roles' | 'audit' | 'backups' | 'settings'
 
 interface NavItem {
   key: NavKey
@@ -22,6 +22,7 @@ const NAV: NavItem[] = [
   { key: 'sales', to: '/sales', icon: <Receipt />, permission: 'sales.view' },
   { key: 'customers', to: '/customers', icon: <Contact />, permission: 'sales.view' },
   { key: 'shifts', to: '/shifts', icon: <Timer />, permission: 'sales.view' },
+  { key: 'reports', to: '/reports', icon: <ChartColumn />, permission: 'reports.view' },
   { key: 'products', to: '/products', icon: <Package />, permission: 'catalog.view' },
   { key: 'stock', to: '/stock', icon: <ClipboardList />, permission: 'stock.view' },
   { key: 'purchases', to: '/purchases', icon: <ReceiptText />, permission: 'purchases.view' },

@@ -125,6 +125,7 @@ export interface ProductVariantsTable {
   sku: string
   label: string | null
   cost_minor: number
+  reorder_level_milli: Generated<number | null>
   is_default: number
   archived_at: number | null
   created_at: number
@@ -387,6 +388,7 @@ export interface SalesTable {
   discount_minor: number
   tax_minor: number
   total_minor: number
+  cost_minor: Generated<number>
   tendered_minor: number
   change_minor: number
   notes: string | null
@@ -414,6 +416,9 @@ export interface SaleLinesTable {
   cost_minor: number
   serials: string | null
   return_of_line: string | null
+  // The day it counts in reports, cleared when the document is voided.
+  report_date: string | null
+  is_return: Generated<number>
   returned_base_milli: Generated<number>
   refunded_minor: Generated<number>
   returned_cost_minor: Generated<number>

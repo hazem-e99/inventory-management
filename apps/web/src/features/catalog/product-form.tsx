@@ -58,6 +58,7 @@ const formSchema = z.object({
         label: z.string().max(120, 'TEXT_TOO_LONG'),
         sku: z.string().max(40, 'TEXT_TOO_LONG'),
         cost: moneyText,
+        reorder: z.string().refine((value) => value.trim() === '' || parseQuantity(value) !== null, 'QUANTITY_INVALID'),
         barcodes: z.array(barcodeRow),
         prices: z.record(z.string(), moneyText),
         attributeValueIds: z.array(z.string()),
@@ -76,6 +77,7 @@ export const emptyVariant = (label = '', attributeValueIds: string[] = []): Vari
   label,
   sku: '',
   cost: '',
+  reorder: '',
   barcodes: [],
   prices: {},
   attributeValueIds,
@@ -121,6 +123,7 @@ function toValues(product: Product | null, features: Features): FormValues {
       label: variant.label ?? '',
       sku: variant.sku,
       cost: variant.costMinor ? moneyToText(variant.costMinor) : '',
+      reorder: variant.reorderLevelMilli === null ? '' : quantityToText(variant.reorderLevelMilli),
       barcodes: variant.barcodes,
       prices: Object.fromEntries(
         variant.prices.map(({ priceListId, unitId, amountMinor }) => [
@@ -152,6 +155,7 @@ function toBody(values: FormValues) {
       label: variant.label,
       ...(variant.sku.trim() ? { sku: variant.sku } : {}),
       costMinor: parseMoney(variant.cost) ?? 0,
+      reorderLevelMilli: variant.reorder.trim() ? parseQuantity(variant.reorder) : null,
       barcodes: variant.barcodes,
       prices: Object.entries(variant.prices).flatMap(([key, text]) => {
         const amountMinor = parseMoney(text)
@@ -387,9 +391,17 @@ function VariantEditor({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <TextField form={form} name={`variants.${index}.sku`} dir="ltr" label={t('product.sku')} hint={t('product.skuHint')} />
         <TextField form={form} name={`variants.${index}.cost`} dir="ltr" inputMode="decimal" label={t('product.cost')} />
+        <TextField
+          form={form}
+          name={`variants.${index}.reorder`}
+          dir="ltr"
+          inputMode="decimal"
+          label={t('product.reorderLevel')}
+          hint={t('product.reorderHint')}
+        />
       </div>
 
       <div className="grid grid-cols-3 gap-4">

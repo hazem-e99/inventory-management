@@ -42,7 +42,9 @@
     "addVariant": "Add variant",
     "removeVariant": "Remove variant",
     "saved": "Item saved",
-    "save": "Save item"
+    "save": "Save item",
+    "reorderLevel": "Reorder level",
+    "reorderHint": "You're alerted when stock reaches this."
   },
   "common": {
     "add": "Add",
@@ -133,6 +135,10 @@
     "shifts": {
       "label": "Shifts",
       "other": "الورديات"
+    },
+    "reports": {
+      "label": "Reports",
+      "other": "التقارير"
     }
   },
   "account": {
@@ -319,7 +325,9 @@
     "sales.void": "Void sales invoices",
     "customers.manage": "Manage customers",
     "customers.collect": "Collect customer payments",
-    "shifts.manage": "Close other people's shifts"
+    "shifts.manage": "Close other people's shifts",
+    "reports.view": "View reports",
+    "reports.profit": "See cost, profit and stock value"
   },
   "audit": {
     "time": "Time",
@@ -372,7 +380,8 @@
       "shift.cash_moved": "Shift cash movement",
       "customer.created": "Customer added",
       "customer.collected": "Customer payment",
-      "customer.receipt_voided": "Customer receipt voided"
+      "customer.receipt_voided": "Customer receipt voided",
+      "report.exported": "Report exported"
     }
   },
   "backups": {
@@ -1213,5 +1222,118 @@
     "change": "Change",
     "thanks": "Thank you for your visit",
     "returnOf": "Return of"
+  },
+  "reports": {
+    "groups": {
+      "sales": "Sales",
+      "stock": "Stock",
+      "accounts": "Accounts"
+    },
+    "titles": {
+      "sales": "Daily sales",
+      "items": "Item profitability",
+      "inventory": "Stock value",
+      "movements": "Stock movements",
+      "reorder": "Reorder list",
+      "expiry": "Expiring stock",
+      "dead": "Slow stock",
+      "suppliers": "Supplier accounts",
+      "customers": "Customer accounts",
+      "shifts": "Shift report"
+    },
+    "descriptions": {
+      "sales": "Sales, returns and profit for each day.",
+      "items": "What each item sold and earned, with its ABC class.",
+      "inventory": "What is on hand now and what it is worth at cost.",
+      "movements": "Every movement in and out of stock.",
+      "reorder": "Items at or below their reorder level, with a suggested quantity.",
+      "expiry": "Batches expired or close to it.",
+      "dead": "Stock that hasn't sold for a while.",
+      "suppliers": "Purchases, payments and balance for each supplier.",
+      "customers": "Account sales, payments and balance for each customer.",
+      "shifts": "Each shift's sales and drawer difference."
+    },
+    "columns": {
+      "date": "Date",
+      "salesCount": "Invoices",
+      "returnsCount": "Returns",
+      "salesMinor": "Sales",
+      "returnsMinor": "Returns",
+      "netMinor": "Net",
+      "discountMinor": "Discounts",
+      "taxMinor": "Tax",
+      "costMinor": "Cost",
+      "profitMinor": "Profit",
+      "name": "Item",
+      "sku": "SKU",
+      "qtyMilli": "Quantity",
+      "abc": "Class",
+      "category": "Category",
+      "onHandMilli": "On hand",
+      "averageCostMinor": "Average cost",
+      "valueMinor": "Value",
+      "occurredAt": "Time",
+      "warehouse": "Warehouse",
+      "lotNo": "Batch",
+      "kind": "Type",
+      "documentNumber": "Document",
+      "levelMilli": "Reorder level",
+      "soldLastMonthMilli": "Sold in 30 days",
+      "suggestedMilli": "Suggested",
+      "supplier": "Last supplier",
+      "expiryDate": "Expiry",
+      "daysLeft": "Days left",
+      "lastSoldOn": "Last sold",
+      "purchasesMinor": "Purchases",
+      "paidMinor": "Paid",
+      "balanceMinor": "Balance",
+      "partyName": "Name",
+      "collectedMinor": "Collected",
+      "number": "Number",
+      "cashier": "Cashier",
+      "openedAt": "Opened",
+      "expectedCashMinor": "Expected",
+      "countedCashMinor": "Counted",
+      "differenceMinor": "Difference"
+    },
+    "from": "From",
+    "to": "To",
+    "days": "Days",
+    "period": "Period",
+    "periods": {
+      "today": "Today",
+      "week": "Last 7 days",
+      "month": "Last 30 days",
+      "quarter": "Last 90 days",
+      "year": "Last year",
+      "custom": "Custom"
+    },
+    "totals": "Total",
+    "emptyTitle": "Nothing in this period",
+    "emptyBody": "Change the period, or record some activity.",
+    "emptyPlain": "Nothing to show right now.",
+    "exportExcel": "Excel",
+    "exportPdf": "PDF",
+    "exported": "{{rows}} rows saved",
+    "pdfSaved": "PDF saved",
+    "pdfLimit": "Includes the first {{rows}} rows. Use Excel for the whole report.",
+    "printedAt": "Printed {{date}}",
+    "createOrder": "Order the suggestion",
+    "dashboard": {
+      "title": "Today",
+      "net": "Net sales today",
+      "invoices": "Invoices",
+      "returns": "Returns",
+      "profit": "Profit",
+      "trend": "Net sales, last 14 days",
+      "alerts": "Needs your attention",
+      "alertsClear": "Nothing needs your attention.",
+      "lowStock": "Items at their reorder level",
+      "nearExpiry": "Batches expiring soon",
+      "expired": "Expired batches in stock",
+      "allReports": "All reports",
+      "day": "Day",
+      "amount": "Net"
+    }
   }
 }

@@ -3,6 +3,8 @@ import { Kysely, sql, SqliteDialect } from 'kysely'
 import type BetterSqlite3 from 'better-sqlite3'
 import type { Database } from './schema'
 
+const CACHE_KIB = 64_000
+
 const require = createRequire(import.meta.url)
 
 export interface SqliteOptions {
@@ -43,6 +45,8 @@ export function createSqliteDb(options: SqliteOptions): Kysely<Database> {
     // FULL because shops lose power: a posted sale must survive a sudden outage.
     sqlite.pragma('synchronous = FULL')
     sqlite.pragma('busy_timeout = 5000')
+    // Every page read from disk is decrypted, so keeping pages in memory matters more than usual.
+    sqlite.pragma(`cache_size = -${CACHE_KIB}`)
   } catch (error) {
     sqlite.close()
     throw error

@@ -13,6 +13,7 @@ import { useActor, useCan } from '../../lib/session'
 import { useAuditLabel } from '../audit/audit-label'
 import { backupsQuery } from '../backups/queries'
 import { settingsQuery } from '../settings/queries'
+import { DashboardPanel } from './dashboard'
 
 function StatusRow({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
@@ -103,10 +104,12 @@ export function HomePage() {
   const settings = useQuery(settingsQuery)
   const canBackUp = useCan('backups.manage')
   const canAudit = useCan('audit.view')
+  const canReport = useCan('reports.view')
 
   return (
     <div className="flex flex-col gap-8">
       <Sign title={t('home.greeting', { name: actor.fullName })} secondary={settings.data?.store.name} />
+      {canReport && <DashboardPanel />}
       <section className="flex max-w-3xl flex-col gap-2">
         <h2 className="text-lg font-semibold text-ink">{t('home.statusTitle')}</h2>
         <div className="rounded-lg border border-rule bg-surface">

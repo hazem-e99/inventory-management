@@ -1,4 +1,5 @@
 import { randomBytes } from 'node:crypto'
+import { writeFile } from 'node:fs/promises'
 import { extname, isAbsolute, join, relative, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import {
@@ -207,6 +208,20 @@ function registerIpc(): void {
         )
       }),
   )
+
+  handle('print:pdf', async (event, job: { defaultName: string; landscape: boolean }) => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    if (!window) return { saved: false }
+    const target = await dialog.showSaveDialog(window, {
+      defaultPath: job.defaultName,
+      filters: [{ name: 'PDF', extensions: ['pdf'] }],
+    })
+    if (target.canceled || !target.filePath) return { saved: false }
+
+    const pdf = await event.sender.printToPDF({ pageSize: 'A4', landscape: job.landscape, printBackground: true })
+    await writeFile(target.filePath, pdf)
+    return { saved: true }
+  })
 
   handle(
     'backup:restore',

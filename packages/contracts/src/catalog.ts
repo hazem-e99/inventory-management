@@ -80,6 +80,8 @@ export const variantInputSchema = z.object({
   label: optionalText(120),
   sku: z.string().trim().max(40, 'TEXT_TOO_LONG').optional(),
   costMinor: moneyMinorSchema,
+  // Stock at or below this shows up as needing an order. Null means the item isn't watched.
+  reorderLevelMilli: z.number({ error: 'QUANTITY_INVALID' }).int('QUANTITY_INVALID').min(0, 'QUANTITY_INVALID').nullable().optional(),
   barcodes: z.array(barcodeInputSchema),
   prices: z.array(priceInputSchema),
   attributeValueIds: z.array(idSchema),
@@ -115,6 +117,7 @@ const variantSchema = z.object({
   label: z.string().nullable(),
   sku: z.string(),
   costMinor: z.number(),
+  reorderLevelMilli: z.number().nullable(),
   isDefault: z.boolean(),
   barcodes: z.array(z.object({ code: z.string(), unitId: z.string() })),
   prices: z.array(z.object({ priceListId: z.string(), unitId: z.string(), amountMinor: z.number() })),

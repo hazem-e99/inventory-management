@@ -136,6 +136,7 @@ async function writeVariants(trx: Kysely<Database>, input: ProductOutput, produc
       sku,
       label: variant.label ?? null,
       cost_minor: variant.costMinor,
+      reorder_level_milli: variant.reorderLevelMilli ?? null,
       is_default: index === 0 ? 1 : 0,
       updated_at: now,
     }
@@ -199,6 +200,7 @@ async function loadProduct(db: Kysely<Database>, id: string): Promise<Product> {
       label: variant.label,
       sku: variant.sku,
       costMinor: Number(variant.cost_minor),
+      reorderLevelMilli: variant.reorder_level_milli === null ? null : Number(variant.reorder_level_milli),
       isDefault: variant.is_default === 1,
       barcodes: barcodes
         .filter((barcode) => barcode.variant_id === variant.id)

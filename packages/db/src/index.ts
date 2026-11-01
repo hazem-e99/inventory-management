@@ -31,7 +31,7 @@ export {
   type ShiftRecord,
 } from './sales.repo'
 export { rolesRepo, sessionsRepo, usersRepo, type RoleRow, type UserRow } from './identity.repo'
-export { LATEST_MIGRATION, migrateToLatest } from './migrate'
+export { LATEST_MIGRATION, migrateTo, migrateToLatest } from './migrate'
 export {
   attributesRepo,
   referenceRepo,
@@ -39,6 +39,7 @@ export {
   type ReferenceRow,
   type ReferenceTable,
 } from './reference.repo'
+export { reportsRepo } from './reports.repo'
 export { nextSequence } from './sequences'
 export { stockRepo, type StockDocumentRecord, type StockLineRecord, type VariantRule } from './stock.repo'
 export {

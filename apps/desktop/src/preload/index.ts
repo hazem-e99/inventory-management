@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('desktop', {
   listPrinters: () => ipcRenderer.invoke('print:printers'),
   print: (job: { deviceName: string | null; widthMm: number | null; heightMm: number | null }) =>
     ipcRenderer.invoke('print:run', job),
+  savePdf: (job: { defaultName: string; landscape: boolean }) => ipcRenderer.invoke('print:pdf', job),
   restoreBackup: (input: { path: string; recoveryCode: string }) =>
     ipcRenderer.invoke('backup:restore', input),
 })

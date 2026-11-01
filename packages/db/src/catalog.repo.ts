@@ -66,7 +66,7 @@ export function catalogRepo(db: Kysely<Database>) {
       return db.updateTable('products').set(changes).where('id', '=', id).execute()
     },
 
-    insertVariant(variant: Omit<VariantRecord, 'archived_at'>) {
+    insertVariant(variant: Omit<VariantRecord, 'archived_at' | 'reorder_level_milli'> & Partial<Pick<VariantRecord, 'reorder_level_milli'>>) {
       return db.insertInto('product_variants').values({ ...variant, archived_at: null }).execute()
     },
 
