@@ -62,6 +62,7 @@ const routeTree = rootRoute.addChildren([
   page('/shifts/$id', () => import('../features/sales/shift-page'), 'ShiftPage'),
   page('/reports', () => import('../features/reports/reports-page'), 'ReportsPage'),
   page('/reports/$key', () => import('../features/reports/report-page'), 'ReportPage'),
+  page('/license', () => import('../features/license/license-page'), 'LicensePage'),
   page('/users', () => import('../features/users/users-page'), 'UsersPage'),
   page('/roles', () => import('../features/users/roles-page'), 'RolesPage'),
   page('/audit', () => import('../features/audit/audit-page'), 'AuditPage'),

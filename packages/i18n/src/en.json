@@ -139,6 +139,10 @@
     "reports": {
       "label": "Reports",
       "other": "التقارير"
+    },
+    "license": {
+      "label": "License",
+      "other": "الترخيص"
     }
   },
   "account": {
@@ -381,7 +385,8 @@
       "customer.created": "Customer added",
       "customer.collected": "Customer payment",
       "customer.receipt_voided": "Customer receipt voided",
-      "report.exported": "Report exported"
+      "report.exported": "Report exported",
+      "license.activated": "License activated"
     }
   },
   "backups": {
@@ -545,7 +550,15 @@
     "SALE_HAS_RETURNS": "This invoice has a return on it, so it can't be voided. Void the return first.",
     "SALE_NOT_RETURNABLE": "This document can't be returned, because it is voided or is itself a return.",
     "RECEIPT_ALREADY_VOIDED": "This receipt is already voided.",
-    "PRINT_FAILED": "Printing failed. Check the printer is connected and chosen in settings. The sale itself is recorded."
+    "PRINT_FAILED": "Printing failed. Check the printer is connected and chosen in settings. The sale itself is recorded.",
+    "LICENSE_TOKEN_INVALID": "That activation code isn't valid. Copy all of it and try again.",
+    "LICENSE_OTHER_DEVICE": "This code was made for another device. Ask for one using this device's number.",
+    "LICENSE_READ_ONLY": "The app is read-only because the license isn't active. You can still view, export and back up. Renew it to carry on working.",
+    "LICENSE_SERIAL_INVALID": "That serial isn't valid. Check it and try again.",
+    "LICENSE_TAKEN": "This serial is active on another device. Contact us to move it here.",
+    "LICENSE_STOPPED": "This license has been stopped. Contact us.",
+    "LICENSE_RATE_LIMITED": "Too many attempts. Wait a minute and try again.",
+    "LICENSE_SERVER_UNREACHABLE": "The license server can't be reached. Check the internet, or use an activation code."
   },
   "reference": {
     "tabs": {
@@ -1335,5 +1348,40 @@
       "day": "Day",
       "amount": "Net"
     }
+  },
+  "license": {
+    "title": "Activate the app",
+    "body": "Enter the serial you were given to begin.",
+    "serial": "Serial",
+    "activate": "Activate",
+    "activated": "The app is activated",
+    "noInternet": "No internet?",
+    "offlineBody": "Send this device's number to support, then paste the code you get back.",
+    "deviceId": "Device number",
+    "code": "Activation code",
+    "useCode": "Activate with code",
+    "askOwner": "Ask the account owner to activate the app.",
+    "otherDevice": "This license belongs to another device, so it doesn't work here. Activate the app on this one.",
+    "signOut": "Sign out",
+    "pageTitle": "License",
+    "status": "Status",
+    "statuses": {
+      "active": "Active",
+      "grace": "Grace period",
+      "read_only": "Read-only",
+      "unlicensed": "Not activated"
+    },
+    "customer": "Customer",
+    "expiresAt": "Expires on",
+    "daysLeft": "Days left",
+    "checkIn": "Update from the server",
+    "checked": "License updated",
+    "renew": "Renew with a serial or code",
+    "bannerGrace": "The license has expired. {{days}} days left before the app turns read-only.",
+    "bannerExpired": "The license has expired and the app is read-only. Your data is safe and can be exported.",
+    "bannerSuspended": "The license is suspended and the app is read-only. Your data is safe and can be exported.",
+    "renewLink": "Details",
+    "readOnlyTitle": "Selling is paused",
+    "readOnlyBody": "The license isn't active. Renew it to sell again."
   }
 }

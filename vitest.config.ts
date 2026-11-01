@@ -41,6 +41,24 @@ export default defineConfig({
       },
       {
         test: {
+          name: 'license-core',
+          root: 'packages/license-core',
+          include: ['test/**/*.test.ts'],
+          environment: 'node',
+        },
+      },
+      {
+        test: {
+          name: 'license-server',
+          root: 'apps/license-server',
+          include: ['test/**/*.test.ts'],
+          environment: 'node',
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
+        },
+      },
+      {
+        test: {
           name: 'domain',
           root: 'packages/domain',
           include: ['test/**/*.test.ts'],

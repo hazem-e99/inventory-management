@@ -1,6 +1,8 @@
 import { readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { signLicenseToken } from '@inv/license-core'
 import { _electron as electron, expect, type ElectronApplication, type Page } from '@playwright/test'
+import { DEVELOPMENT_PRIVATE_KEY } from './dev-license-key'
 
 const appRoot = join(__dirname, '..')
 const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8')
@@ -13,8 +15,12 @@ interface AxeResult {
 
 const running = new Set<ElectronApplication>()
 
-export async function launch(userData: string): Promise<ElectronApplication> {
-  const app = await electron.launch({ args: [appRoot, `--user-data-dir=${userData}`], cwd: appRoot })
+export async function launch(userData: string, env: Record<string, string> = {}): Promise<ElectronApplication> {
+  const app = await electron.launch({
+    args: [appRoot, `--user-data-dir=${userData}`],
+    cwd: appRoot,
+    env: { ...process.env, ...env } as Record<string, string>,
+  })
   running.add(app)
   app.once('close', () => running.delete(app))
   return app
@@ -66,6 +72,13 @@ export async function expectAccessible(page: Page): Promise<void> {
 
 /** Walks the whole first-run flow in Arabic and returns the recovery code. */
 export async function completeOnboarding(page: Page, business: RegExp = /صيدلية/): Promise<string> {
+  const code = await completeOnboardingWithoutLicense(page, business)
+  await activateOffline(page)
+  await expect(page.getByRole('heading', { name: 'أهلاً، حازم عصام' })).toBeVisible()
+  return code
+}
+
+export async function completeOnboardingWithoutLicense(page: Page, business: RegExp = /صيدلية/): Promise<string> {
   await expectAccessible(page)
   await page.getByRole('button', { name: 'التالي' }).click()
   await page.getByRole('radio', { name: business }).click()
@@ -94,8 +107,33 @@ export async function completeOnboarding(page: Page, business: RegExp = /صيد�
   await expect(start).toBeDisabled()
   await page.getByRole('checkbox', { name: /كتبت الكود/ }).check()
   await start.click()
-  await expect(page.getByRole('heading', { name: 'أهلاً، حازم عصام' })).toBeVisible()
   return code
+}
+
+/** Pastes a code signed for this device, as a shop with no internet does. */
+export async function activateOffline(page: Page, days = 365): Promise<void> {
+  await expect(page.getByRole('heading', { name: 'تفعيل البرنامج' })).toBeVisible()
+  await page.getByRole('button', { name: 'لا يوجد إنترنت؟' }).click()
+  await pasteCode(page, days)
+}
+
+/** Fills the code form on whichever screen is showing it. */
+export async function pasteCode(page: Page, days: number): Promise<void> {
+  const fingerprint = await page.getByTestId('device-id').innerText()
+  const code = signLicenseToken(
+    {
+      v: 1,
+      licenseId: 'e2e',
+      customer: 'صيدلية النور',
+      fingerprint: fingerprint.trim(),
+      issuedAt: Date.now(),
+      expiresAt: Date.now() + days * 86_400_000,
+      suspended: false,
+    },
+    DEVELOPMENT_PRIVATE_KEY,
+  )
+  await page.getByLabel('كود التفعيل').fill(code)
+  await page.getByRole('button', { name: 'تفعيل بالكود' }).click()
 }
 
 const BARCODE = '4006381333931'

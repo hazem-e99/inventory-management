@@ -31,7 +31,7 @@ afterAll(async () => {
   await Promise.all(cleanups.splice(0).map((cleanup) => cleanup()))
 })
 
-export async function createHarness(): Promise<Harness> {
+export async function createHarness(overrides: Partial<AppDeps> = {}): Promise<Harness> {
   const dir = mkdtempSync(join(tmpdir(), 'inv-api-'))
   const hexKey = randomBytes(32).toString('hex')
   const db = createSqliteDb({ path: join(dir, 'test.db'), hexKey })
@@ -48,6 +48,7 @@ export async function createHarness(): Promise<Harness> {
     backupsDir: join(dir, 'backups'),
     clock: () => time.now,
     logError: () => {},
+    ...overrides,
   }
   const app = createApp(deps)
 
@@ -86,8 +87,8 @@ export async function createHarness(): Promise<Harness> {
   }
 }
 
-export async function onboarded(): Promise<{ harness: Harness; owner: OnboardingResult }> {
-  const harness = await createHarness()
+export async function onboarded(overrides: Partial<AppDeps> = {}): Promise<{ harness: Harness; owner: OnboardingResult }> {
+  const harness = await createHarness(overrides)
   const owner = await harness.json<OnboardingResult>('POST', '/onboarding', { body: ONBOARDING })
   return { harness, owner }
 }

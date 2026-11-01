@@ -2,8 +2,11 @@ import type { AddressInfo } from 'node:net'
 import { serve } from '@hono/node-server'
 import { createSqliteDb, migrateToLatest, sessionsRepo, settingsRepo, type SqliteOptions } from '@inv/db'
 import { createApp } from './app'
-import type { AppDeps } from './http/context'
+import type { AppDeps, LicenseConfig } from './http/context'
 import { runAutomaticBackup } from './modules/backups'
+import { licenseHeartbeat } from './modules/license'
+
+export type { LicenseConfig }
 
 export interface StartOptions {
   database: SqliteOptions
@@ -11,6 +14,7 @@ export interface StartOptions {
   token: string
   allowedOrigin: string
   version: string
+  license: LicenseConfig
 }
 
 export interface RunningApi {
@@ -19,6 +23,7 @@ export interface RunningApi {
 }
 
 const AUTOMATIC_BACKUP_CHECK_MS = 60 * 60 * 1000
+const LICENSE_CHECK_IN_MS = 60 * 60 * 1000
 
 export async function startApi(options: StartOptions): Promise<RunningApi> {
   const db = createSqliteDb(options.database)
@@ -39,6 +44,7 @@ export async function startApi(options: StartOptions): Promise<RunningApi> {
     databaseKey: options.database.hexKey,
     backupsDir: options.backupsDir,
     clock,
+    license: options.license,
     logError: (message, details) => console.error(message, details),
   }
 
@@ -53,6 +59,10 @@ export async function startApi(options: StartOptions): Promise<RunningApi> {
   const backupTimer = setInterval(backUp, AUTOMATIC_BACKUP_CHECK_MS)
   backupTimer.unref()
 
+  void licenseHeartbeat(deps)
+  const licenseTimer = setInterval(() => void licenseHeartbeat(deps), LICENSE_CHECK_IN_MS)
+  licenseTimer.unref()
+
   return new Promise((resolve) => {
     // Port 0 lets the OS pick; the loopback bind keeps the API off the shop network.
     const server = serve({ fetch: app.fetch, hostname: '127.0.0.1', port: 0 }, (info: AddressInfo) => {
@@ -60,6 +70,7 @@ export async function startApi(options: StartOptions): Promise<RunningApi> {
         port: info.port,
         stop: async () => {
           clearInterval(backupTimer)
+          clearInterval(licenseTimer)
           await new Promise<void>((done) => server.close(() => done()))
           await db.destroy()
         },

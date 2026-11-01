@@ -20,6 +20,8 @@ const STATUS: Partial<Record<RequestCode, ContentfulStatusCode>> = {
   NOT_FOUND: 404,
   INTERNAL: 500,
   BACKUP_FAILED: 500,
+  LICENSE_READ_ONLY: 403,
+  LICENSE_SERVER_UNREACHABLE: 503,
 }
 
 export interface AppErrorOptions {

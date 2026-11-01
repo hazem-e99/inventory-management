@@ -20,10 +20,17 @@ const KEYS = {
   recovery: 'recovery',
   stockPolicy: 'stock_policy',
   pos: 'pos',
+  license: 'license',
 } as const
 
 const DEFAULT_PREFERENCES: Preferences = { locale: 'ar', theme: 'system', digits: 'latin' }
 const DEFAULT_POS: PosSettings = { warehouseId: 'main', receiptPaper: '80mm', printerName: null, autoPrint: false }
+
+export interface StoredLicense {
+  token: string | null
+  /** The latest moment this device has reached, so the clock can't be wound back. */
+  lastSeenAt: number
+}
 
 /** Typed access to the settings rows. Reads are validated, since these outlive app versions. */
 export function storeSettings(db: Kysely<Database>) {
@@ -66,6 +73,12 @@ export function storeSettings(db: Kysely<Database>) {
     },
 
     setPos: (pos: PosSettings, now: number) => settings.setJson(KEYS.pos, pos, now),
+
+    async license(): Promise<StoredLicense> {
+      return (await settings.getJson<StoredLicense>(KEYS.license)) ?? { token: null, lastSeenAt: 0 }
+    },
+
+    setLicense: (license: StoredLicense, now: number) => settings.setJson(KEYS.license, license, now),
 
     recovery: () => settings.getJson<KeyEnvelope>(KEYS.recovery),
 

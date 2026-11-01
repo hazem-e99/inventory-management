@@ -17,6 +17,7 @@ import type { StartOptions } from '@inv/api'
 import { LATEST_MIGRATION } from '@inv/db'
 import type { ApiProcessEvent, ApiProcessRequest } from './api-process'
 import { DatabaseKeyUnavailable, loadDatabaseKey, storeDatabaseKey } from './database-key'
+import { licenseConfig } from './license-config'
 import { restoreBackup } from './restore'
 
 const RENDERER_ORIGIN = 'app://renderer'
@@ -122,6 +123,7 @@ async function startApi(): Promise<void> {
     token,
     allowedOrigin,
     version: app.getVersion(),
+    license: await licenseConfig(app.isPackaged),
   })
   startup = { kind: 'ready', baseUrl: `http://127.0.0.1:${port}`, token }
 }

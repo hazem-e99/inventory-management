@@ -10,6 +10,7 @@ import { authRoutes } from './modules/auth'
 import { backupRoutes } from './modules/backups'
 import { catalogFileRoutes } from './modules/catalog-import'
 import { customerRoutes } from './modules/customers'
+import { licenseGuard, licenseRoutes } from './modules/license'
 import { onboardingRoutes } from './modules/onboarding'
 import { productRoutes } from './modules/products'
 import { purchaseRoutes } from './modules/purchases'
@@ -68,6 +69,8 @@ export function createApp(deps: AppDeps) {
     return c.json(health)
   })
 
+  app.use(licenseGuard(deps))
+
   app.route('/', onboardingRoutes(deps))
   app.route('/', authRoutes(deps))
   app.route('/', usersRoutes(deps))
@@ -87,6 +90,7 @@ export function createApp(deps: AppDeps) {
   app.route('/', shiftRoutes(deps))
   app.route('/', customerRoutes(deps))
   app.route('/', reportRoutes(deps))
+  app.route('/', licenseRoutes(deps))
 
   app.doc('/openapi.json', {
     openapi: '3.1.0',

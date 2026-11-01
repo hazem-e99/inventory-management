@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: licenses
+      POSTGRES_USER: licenses
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set it in .env}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U licenses]
+      interval: 5s
+      retries: 10
+
+  server:
+    build:
+      context: ../..
+      dockerfile: deploy/license-server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://licenses:${POSTGRES_PASSWORD}@postgres:5432/licenses
+      LICENSE_PRIVATE_KEY: ${LICENSE_PRIVATE_KEY:?set it in .env}
+      SERIAL_HMAC_KEY: ${SERIAL_HMAC_KEY:?set it in .env}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set it in .env}
+      PUBLIC_URL: https://${LICENSE_DOMAIN:?set it in .env}
+      ADMIN_DIST: /app/admin
+      TRUST_PROXY: 'true'
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on: [server]
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      LICENSE_DOMAIN: ${LICENSE_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  postgres:
+  caddy-data:
+  caddy-config:

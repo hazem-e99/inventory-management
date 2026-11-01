@@ -10,7 +10,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
-    "dist": "electron-vite build && electron-builder --win",
+    "dist": "node scripts/require-release-keys.mjs && electron-vite build && electron-builder --win",
     "test:e2e": "electron-vite build && playwright test"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "@inv/api": "workspace:*",
     "@inv/contracts": "workspace:*",
     "@inv/db": "workspace:*",
+    "@inv/license-core": "workspace:*",
     "@inv/web": "workspace:*",
     "@types/node": "^24.0.0",
     "@vitejs/plugin-react": "^6.0.0",
@@ -31,6 +32,7 @@
     "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.3.3",
     "tailwindcss": "^4.3.3",
-    "axe-core": "^4.11.0"
+    "axe-core": "^4.11.0",
+    "otpauth": "^9.5.2"
   }
 }

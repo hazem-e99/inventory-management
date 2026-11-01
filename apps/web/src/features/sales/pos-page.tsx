@@ -15,6 +15,7 @@ import { useActor, useCan } from '../../lib/session'
 import { referenceQuery, useReferenceName } from '../catalog/queries'
 import { cartActions, unitPriceOf, useCart, type Cart, type CartLine } from './cart-store'
 import { CustomerPickDialog, HeldDialog, HoldDialog, PaymentDialog, heldQuery } from './pos-dialogs'
+import { licenseQuery } from '../license/queries'
 import { currentShiftQuery } from './queries'
 import { usePrinter } from './receipt'
 import { CashDialog, OpenShiftForm } from './shift-panels'
@@ -583,6 +584,16 @@ export function PosPage() {
   const actor = useActor()
   const shift = useQuery(currentShiftQuery)
   const units = useQuery(referenceQuery('units'))
+  const license = useQuery(licenseQuery)
+
+  if (license.data?.status === 'read_only') {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-2 p-8 text-center">
+        <h2 className="text-lg font-semibold text-ink">{t('license.readOnlyTitle')}</h2>
+        <p className="max-w-prose text-ink-soft">{t('license.readOnlyBody')}</p>
+      </div>
+    )
+  }
 
   const failed = shift.error ?? units.error
   if (failed) {

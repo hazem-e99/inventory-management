@@ -1,13 +1,16 @@
 import type { Bootstrap, Permission } from '@inv/contracts'
 import { Button, Menu, MenuItem, MenuLabel, MenuSeparator, Station } from '@inv/ui'
 import { Link, Outlet, useRouterState } from '@tanstack/react-router'
-import { Archive, ChartColumn, ChevronsUpDown, ClipboardList, Contact, FileClock, History, Home, KeyRound, LockKeyhole, LogOut, Package, Receipt, ReceiptText, ScanBarcode, Settings, ShieldCheck, Tags, Timer, Truck, Users } from 'lucide-react'
+import { Archive, BadgeCheck, ChartColumn, ChevronsUpDown, ClipboardList, Contact, FileClock, History, Home, KeyRound, LockKeyhole, LogOut, Package, Receipt, ReceiptText, ScanBarcode, Settings, ShieldCheck, Tags, Timer, Truck, Users } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQuery } from '@tanstack/react-query'
 import { AccountDialogs, type AccountPanel } from '../features/auth/account-dialogs'
+import { ActivationScreen, LicenseBanner } from '../features/license/license-screens'
+import { licenseQuery } from '../features/license/queries'
 import { useActor, useSession } from '../lib/session'
 
-type NavKey = 'home' | 'pos' | 'sales' | 'customers' | 'shifts' | 'reports' | 'products' | 'stock' | 'purchases' | 'orders' | 'suppliers' | 'catalog' | 'users' | 'roles' | 'audit' | 'backups' | 'settings'
+type NavKey = 'home' | 'pos' | 'sales' | 'customers' | 'shifts' | 'reports' | 'products' | 'stock' | 'purchases' | 'orders' | 'suppliers' | 'catalog' | 'users' | 'roles' | 'audit' | 'backups' | 'license' | 'settings'
 
 interface NavItem {
   key: NavKey
@@ -33,6 +36,7 @@ const NAV: NavItem[] = [
   { key: 'roles', to: '/roles', icon: <ShieldCheck />, permission: 'users.view' },
   { key: 'audit', to: '/audit', icon: <History />, permission: 'audit.view' },
   { key: 'backups', to: '/backups', icon: <Archive />, permission: 'backups.manage' },
+  { key: 'license', to: '/license', icon: <BadgeCheck />, permission: 'settings.manage' },
   { key: 'settings', to: '/settings', icon: <Settings /> },
 ]
 
@@ -81,6 +85,9 @@ export function Shell({ bootstrap }: { bootstrap: Bootstrap }) {
   const [panel, setPanel] = useState<AccountPanel>(null)
 
   const items = NAV.filter((item) => !item.permission || actor.permissions.includes(item.permission))
+  const license = useQuery(licenseQuery)
+
+  if (license.data?.status === 'unlicensed') return <ActivationScreen license={license.data} />
 
   return (
     <div className="grid h-screen grid-cols-[17rem_1fr]">
@@ -115,8 +122,9 @@ export function Shell({ bootstrap }: { bootstrap: Bootstrap }) {
         </div>
       </aside>
 
-      <main className="min-h-0 overflow-y-auto">
-        <div className={pathname === '/pos' ? 'h-full' : 'mx-auto flex h-full max-w-6xl flex-col p-8'}>
+      <main className="flex min-h-0 flex-col overflow-y-auto">
+        <LicenseBanner />
+        <div className={pathname === '/pos' ? 'min-h-0 flex-1' : 'mx-auto flex w-full max-w-6xl flex-1 flex-col p-8'}>
           <Outlet />
         </div>
       </main>
