@@ -1,16 +1,17 @@
 import type { Bootstrap, Permission } from '@inv/contracts'
 import { Button, Menu, MenuItem, MenuLabel, MenuSeparator, Station } from '@inv/ui'
 import { Link, Outlet, useRouterState } from '@tanstack/react-router'
-import { Archive, BadgeCheck, ChartColumn, ChevronsUpDown, ClipboardList, Contact, FileClock, History, Home, KeyRound, LockKeyhole, LogOut, Package, Receipt, ReceiptText, ScanBarcode, Settings, ShieldCheck, Tags, Timer, Truck, Users } from 'lucide-react'
+import { Archive, BadgeCheck, ChartColumn, ChevronsUpDown, CircleHelp, ClipboardList, Contact, FileClock, History, Home, KeyRound, LockKeyhole, LogOut, Package, Receipt, ReceiptText, ScanBarcode, Settings, ShieldCheck, Tags, Timer, Truck, Users } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { AccountDialogs, type AccountPanel } from '../features/auth/account-dialogs'
 import { ActivationScreen, LicenseBanner } from '../features/license/license-screens'
 import { licenseQuery } from '../features/license/queries'
+import { UpdateBanner } from '../features/license/update-banner'
 import { useActor, useSession } from '../lib/session'
 
-type NavKey = 'home' | 'pos' | 'sales' | 'customers' | 'shifts' | 'reports' | 'products' | 'stock' | 'purchases' | 'orders' | 'suppliers' | 'catalog' | 'users' | 'roles' | 'audit' | 'backups' | 'license' | 'settings'
+type NavKey = 'home' | 'pos' | 'sales' | 'customers' | 'shifts' | 'reports' | 'products' | 'stock' | 'purchases' | 'orders' | 'suppliers' | 'catalog' | 'users' | 'roles' | 'audit' | 'backups' | 'license' | 'settings' | 'help'
 
 interface NavItem {
   key: NavKey
@@ -38,6 +39,7 @@ const NAV: NavItem[] = [
   { key: 'backups', to: '/backups', icon: <Archive />, permission: 'backups.manage' },
   { key: 'license', to: '/license', icon: <BadgeCheck />, permission: 'settings.manage' },
   { key: 'settings', to: '/settings', icon: <Settings /> },
+  { key: 'help', to: '/help', icon: <CircleHelp /> },
 ]
 
 function AccountMenu({ onOpen }: { onOpen: (panel: AccountPanel) => void }) {
@@ -124,6 +126,7 @@ export function Shell({ bootstrap }: { bootstrap: Bootstrap }) {
 
       <main className="flex min-h-0 flex-col overflow-y-auto">
         <LicenseBanner />
+        <UpdateBanner />
         <div className={pathname === '/pos' ? 'min-h-0 flex-1' : 'mx-auto flex w-full max-w-6xl flex-1 flex-col p-8'}>
           <Outlet />
         </div>

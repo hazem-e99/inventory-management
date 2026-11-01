@@ -2,7 +2,7 @@ import { mkdir, readdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { createRoute } from '@hono/zod-openapi'
 import { backupSchema, backupsListSchema, exportBackupSchema, type Backup } from '@inv/contracts'
-import { auditRepo, isSqliteDbHealthy, LATEST_MIGRATION, newId, snapshotSqliteDb } from '@inv/db'
+import { auditRepo, isSqliteDbHealthy, LATEST_MIGRATION, newId, snapshotSqliteDb, hasPendingUpgrade, migrateToLatest } from '@inv/db'
 import { readBackupHeader, writeBackup } from '@inv/db/backup'
 import type { AppDeps } from '../http/context'
 import { AppError } from '../http/errors'
@@ -72,6 +72,17 @@ export async function createBackup(
   } finally {
     await rm(snapshot, { force: true })
   }
+}
+
+/**
+ * A schema change is the one moment an update touches a shop's records, so a copy is taken first.
+ * If that copy fails, the upgrade doesn't run: an older app on good data beats a newer one on none.
+ */
+export async function upgradeSafely(deps: AppDeps): Promise<void> {
+  if ((await hasPendingUpgrade(deps.db)) && (await storeSettings(deps.db).recovery())) {
+    await createBackup(deps, { automatic: false })
+  }
+  await migrateToLatest(deps.db)
 }
 
 export async function runAutomaticBackup(deps: AppDeps): Promise<void> {

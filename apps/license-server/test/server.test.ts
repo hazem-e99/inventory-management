@@ -1,3 +1,6 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { verifyLicenseToken } from '@inv/license-core'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { ADMIN, PUBLIC_URL, createHarness, type Harness } from './harness'
@@ -283,5 +286,30 @@ describe('the books', () => {
     const { items } = (await (await harness.admin('GET', '/admin/events')).json()) as { items: Array<{ action: string; actor: string; customerName: string }> }
     expect(items.map(({ action }) => action)).toEqual(['license.suspended', 'license.issued', 'customer.created'])
     expect(items[0]).toMatchObject({ actor: ADMIN.email, customerName: 'صيدلية النور' })
+  })
+})
+
+describe('publishing updates', () => {
+  it('serves the folder and nothing outside it', async () => {
+    const parent = mkdtempSync(join(tmpdir(), 'inv-updates-'))
+    const folder = join(parent, 'updates')
+    mkdirSync(folder)
+    writeFileSync(join(folder, 'manifest.json'), '{"signed":true}')
+    writeFileSync(join(parent, 'private.pem'), 'SECRET')
+
+    try {
+      const harness = await createHarness({ updatesDir: folder })
+      const served = await harness.fetch('/updates/manifest.json')
+      expect(served.status).toBe(200)
+      expect(await served.text()).toBe('{"signed":true}')
+
+      expect((await harness.fetch('/updates/missing.exe')).status).toBe(404)
+      for (const path of ['/updates/../private.pem', '/updates/..%2fprivate.pem', '/updates/%2e%2e/private.pem', '/updates/..%5cprivate.pem']) {
+        const response = await harness.fetch(path)
+        expect(await response.text()).not.toContain('SECRET')
+      }
+    } finally {
+      rmSync(parent, { recursive: true, force: true })
+    }
   })
 })

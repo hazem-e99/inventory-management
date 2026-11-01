@@ -45,10 +45,30 @@ docker compose exec server node dist/create-admin.mjs
 ## 4. بناء البرنامج للعملاء
 
 ```bash
-MAIN_VITE_LICENSE_PUBLIC_KEY='...' MAIN_VITE_LICENSE_SERVER_URL='https://licenses.example.com' pnpm dist
+MAIN_VITE_LICENSE_PUBLIC_KEY='...' MAIN_VITE_UPDATE_PUBLIC_KEY='...' MAIN_VITE_LICENSE_SERVER_URL='https://licenses.example.com' pnpm dist
 ```
 
-الأمر يرفض البناء بدون المفتاحين. البرنامج المبني لا يقبل مفتاح التطوير.
+الأمر يرفض البناء بدون المفتاحين العامين والعنوان. البرنامج المبني لا يقبل مفتاح التطوير.
+
+## التحديثات
+
+مفتاح التحديث منفصل عن مفتاح التراخيص، ولا يوضع على السيرفر أبداً.
+
+```bash
+pnpm --filter @inv/license-server generate-update-key
+```
+
+احفظ المفتاح الخاص خارج المستودع مع نسخة أوفلاين، وأضف `MAIN_VITE_UPDATE_PUBLIC_KEY` لمتغيرات البناء. `pnpm dist` يرفض البناء بدونه.
+
+لنشر إصدار جديد: غيّر `version` في `apps/desktop/package.json` وابنِ، ثم:
+
+```bash
+UPDATE_SIGNING_KEY_FILE=/path/to/update.pem pnpm --filter @inv/desktop publish-update
+```
+
+ارفع ملف الـ exe أولاً ثم `manifest.json` إلى `deploy/license-server/updates/` على السيرفر. بهذا الترتيب لا يوجد وقت يشير فيه البيان إلى ملف غير موجود. لا حاجة لإعادة تشغيل السيرفر.
+
+البرامج المثبتة تفحص عند التشغيل وكل 6 ساعات، وتثبت التحديث عند الإغلاق.
 
 ## 5. النسخ الاحتياطي
 

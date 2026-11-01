@@ -1,6 +1,6 @@
 import type { Kysely } from 'kysely'
 import { afterAll, describe, expect, it } from 'vitest'
-import { migrateTo, migrateToLatest, type Database } from '../src'
+import { hasPendingUpgrade, migrateTo, migrateToLatest, type Database } from '../src'
 import { dialects, tempDir } from './helpers'
 
 const dir = tempDir()
@@ -61,6 +61,20 @@ async function olderShop(db: Kysely<any>) {
   await db.insertInto('sales').values([sale('a', 'sale', 'posted'), sale('b', 'return', 'posted'), sale('c', 'sale', 'voided')]).execute()
   await db.insertInto('sale_lines').values([line('la', 'a', 120), line('lb', 'b', 70), line('lc', 'c', 30)]).execute()
 }
+
+describe.each(dialects(dir))('telling an upgrade from a first run on %s', (_name, create) => {
+  it('only calls it an upgrade when an older schema is in place', async () => {
+    const db = create()
+    expect(await hasPendingUpgrade(db)).toBe(false)
+
+    await migrateTo(db, '0006_sales')
+    expect(await hasPendingUpgrade(db)).toBe(true)
+
+    await migrateToLatest(db)
+    expect(await hasPendingUpgrade(db)).toBe(false)
+    await db.destroy()
+  })
+})
 
 describe.each(dialects(dir))('upgrading a shop with history on %s', (_name, create) => {
   let db: Kysely<Database>

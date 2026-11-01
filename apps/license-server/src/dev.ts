@@ -30,6 +30,7 @@ const app = createServerApp({
   privateKey,
   serialKey: randomBytes(32).toString('hex'),
   publicUrl,
+  ...(process.env.UPDATES_DIR ? { updatesDir: process.env.UPDATES_DIR } : {}),
   clock: () => Date.now(),
   trustProxy: false,
   logError: (message, details) => console.error(message, details),

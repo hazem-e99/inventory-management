@@ -28,7 +28,10 @@ services:
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set it in .env}
       PUBLIC_URL: https://${LICENSE_DOMAIN:?set it in .env}
       ADMIN_DIST: /app/admin
+      UPDATES_DIR: /updates
       TRUST_PROXY: 'true'
+    volumes:
+      - ./updates:/updates:ro
 
   caddy:
     image: caddy:2

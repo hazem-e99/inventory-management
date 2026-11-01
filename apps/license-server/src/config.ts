@@ -9,6 +9,7 @@ const configSchema = z.object({
   PUBLIC_URL: z.url(),
   PORT: z.coerce.number().int().default(3000),
   ADMIN_DIST: z.string().default('./admin'),
+  UPDATES_DIR: z.string().default('./updates'),
   // Set behind Caddy, so rate limits see the real client and not the proxy.
   TRUST_PROXY: z.enum(['true', 'false']).default('true'),
 })

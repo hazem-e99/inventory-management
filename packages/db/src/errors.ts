@@ -60,3 +60,10 @@ export function classifyConstraintError(error: unknown): ConstraintViolation | n
 
   return null
 }
+
+/** A full disk needs telling apart: it is the one failure the shop can fix itself. */
+export function classifyStorageError(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) return false
+  const { code } = error as DriverError
+  return code === 'SQLITE_FULL' || code === 'ENOSPC' || code === '53100'
+}

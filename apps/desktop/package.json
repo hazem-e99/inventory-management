@@ -1,7 +1,7 @@
 {
   "name": "@inv/desktop",
   "productName": "Inventory",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Inventory management for shops",
   "author": "Inventory",
@@ -11,7 +11,8 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "dist": "node scripts/require-release-keys.mjs && electron-vite build && electron-builder --win",
-    "test:e2e": "electron-vite build && playwright test"
+    "test:e2e": "electron-vite build && playwright test",
+    "publish-update": "node scripts/publish-update.mjs"
   },
   "dependencies": {
     "better-sqlite3-multiple-ciphers": "^13.0.3",

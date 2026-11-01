@@ -10,6 +10,13 @@ const DEVELOPMENT_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
 MCowBQYDK2VwAyEA3TjdpQQoUPrRZu4PAeOHXPTnBxRt5qkW/7CvfbM4EEw=
 -----END PUBLIC KEY-----`
 
+// Same rule as the key above. Updates are verified with their own key, which stays offline.
+const DEVELOPMENT_UPDATE_KEY = `-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAjjPLSrPKKf76/GpEFl8DV+xv8yKAxQP8MGXCCEYHRFo=
+-----END PUBLIC KEY-----`
+
+const RELEASE_UPDATE_KEY = import.meta.env.MAIN_VITE_UPDATE_PUBLIC_KEY?.replace(/\\n/g, '\n')
+
 const RELEASE_PUBLIC_KEY = import.meta.env.MAIN_VITE_LICENSE_PUBLIC_KEY?.replace(/\\n/g, '\n')
 const RELEASE_SERVER_URL = import.meta.env.MAIN_VITE_LICENSE_SERVER_URL
 
@@ -43,4 +50,12 @@ export async function licenseConfig(packaged: boolean): Promise<LicenseConfig> {
 
   if (!RELEASE_PUBLIC_KEY || !RELEASE_SERVER_URL) throw new Error('This build has no license key.')
   return { publicKey: RELEASE_PUBLIC_KEY, serverUrl: RELEASE_SERVER_URL, fingerprint }
+}
+
+export function updateConfig(packaged: boolean): { serverUrl: string; publicKey: string } | null {
+  if (packaged) {
+    return RELEASE_UPDATE_KEY && RELEASE_SERVER_URL ? { serverUrl: RELEASE_SERVER_URL, publicKey: RELEASE_UPDATE_KEY } : null
+  }
+  const serverUrl = process.env['INV_LICENSE_SERVER']
+  return serverUrl ? { serverUrl, publicKey: RELEASE_UPDATE_KEY ?? DEVELOPMENT_UPDATE_KEY } : null
 }

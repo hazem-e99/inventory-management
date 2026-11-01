@@ -177,4 +177,22 @@ describe.each(dialects(dir))('report queries on %s', (_name, create) => {
     expect((await repo.customers(range))[0]).toMatchObject({ salesMinor: 70, balanceMinor: 70 })
     expect((await repo.shifts(range))[0]).toMatchObject({ number: 'SH-1', salesMinor: 500, returnsMinor: 200, cashier: 'كاشير' })
   })
+
+  it('puts a shift opened after midnight in the local day, not the UTC one', async () => {
+    const zone = process.env.TZ
+    process.env.TZ = 'Africa/Cairo'
+    try {
+      const day = '2026-06-20'
+      await db
+        .insertInto('shifts')
+        .values({ id: 's2', number: 'SH-2', status: 'closed', user_id: USER, opened_at: new Date(2026, 5, 20, 0, 30).getTime(), closed_at: 2, closed_by: USER, opening_cash_minor: 0, expected_cash_minor: 0, counted_cash_minor: 0, notes: null })
+        .execute()
+
+      expect((await reportsRepo(db).shifts({ from: day, to: day })).map(({ number }) => number)).toEqual(['SH-2'])
+      expect(await reportsRepo(db).shifts({ from: '2026-06-19', to: '2026-06-19' })).toEqual([])
+    } finally {
+      if (zone === undefined) delete process.env.TZ
+      else process.env.TZ = zone
+    }
+  })
 })

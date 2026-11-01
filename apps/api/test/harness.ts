@@ -6,14 +6,9 @@ import { apiErrorSchema, type ApiError, type OnboardingResult } from '@inv/contr
 import { createSqliteDb, migrateToLatest } from '@inv/db'
 import { afterAll } from 'vitest'
 import { createApp, type AppDeps } from '../src'
+import { ONBOARDING } from './fixtures'
 
-export const OWNER = { fullName: 'حازم عصام', username: 'owner', password: 'owner-password' }
-
-export const ONBOARDING = {
-  locale: 'ar',
-  store: { name: 'صيدلية النور', businessType: 'pharmacy' },
-  owner: OWNER,
-}
+export { ONBOARDING, OWNER } from './fixtures'
 
 export interface Harness {
   deps: AppDeps

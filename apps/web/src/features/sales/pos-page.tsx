@@ -459,6 +459,7 @@ function Till({ units, shiftNumber }: { units: Reference[]; shiftNumber: string 
   return (
     <div className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_21rem]">
       <section aria-label={t('nav.pos.label')} className="flex min-h-0 flex-col gap-3 p-4">
+        <h1 className="sr-only">{t('nav.pos.label')}</h1>
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <ScanBarcode aria-hidden className="absolute start-3 top-3.5 size-5 text-ink-faint" />
@@ -615,6 +616,7 @@ export function PosPage() {
   if (!current) {
     return (
       <div className="flex h-full items-center justify-center p-8">
+        <h1 className="sr-only">{t('nav.pos.label')}</h1>
         <OpenShiftForm />
       </div>
     )

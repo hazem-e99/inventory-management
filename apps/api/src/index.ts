@@ -1,9 +1,10 @@
 import type { AddressInfo } from 'node:net'
 import { serve } from '@hono/node-server'
-import { createSqliteDb, migrateToLatest, sessionsRepo, settingsRepo, type SqliteOptions } from '@inv/db'
+import { createSqliteDb, sessionsRepo, settingsRepo, type SqliteOptions } from '@inv/db'
 import { createApp } from './app'
+import { fileLogger } from './log'
 import type { AppDeps, LicenseConfig } from './http/context'
-import { runAutomaticBackup } from './modules/backups'
+import { runAutomaticBackup, upgradeSafely } from './modules/backups'
 import { licenseHeartbeat } from './modules/license'
 
 export type { LicenseConfig }
@@ -11,6 +12,7 @@ export type { LicenseConfig }
 export interface StartOptions {
   database: SqliteOptions
   backupsDir: string
+  logsDir: string
   token: string
   allowedOrigin: string
   version: string
@@ -27,26 +29,26 @@ const LICENSE_CHECK_IN_MS = 60 * 60 * 1000
 
 export async function startApi(options: StartOptions): Promise<RunningApi> {
   const db = createSqliteDb(options.database)
-  await migrateToLatest(db)
-
   const clock = () => Date.now()
-  const settings = settingsRepo(db)
-  const bootCount = Number((await settings.get('boot_count')) ?? 0) + 1
-  await settings.set('boot_count', String(bootCount), clock())
-  await sessionsRepo(db).deleteExpired(clock())
 
   const deps: AppDeps = {
     db,
     token: options.token,
     allowedOrigin: options.allowedOrigin,
     version: options.version,
-    bootCount,
+    bootCount: 0,
     databaseKey: options.database.hexKey,
     backupsDir: options.backupsDir,
     clock,
     license: options.license,
-    logError: (message, details) => console.error(message, details),
+    logError: fileLogger(options.logsDir),
   }
+  await upgradeSafely(deps)
+
+  const settings = settingsRepo(db)
+  deps.bootCount = Number((await settings.get('boot_count')) ?? 0) + 1
+  await settings.set('boot_count', String(deps.bootCount), clock())
+  await sessionsRepo(db).deleteExpired(clock())
 
   const app = createApp(deps)
 

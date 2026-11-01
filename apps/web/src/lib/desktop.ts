@@ -24,6 +24,10 @@ declare global {
       listPrinters(): Promise<string[]>
       print(job: PrintJob): Promise<{ ok: boolean }>
       savePdf(job: { defaultName: string; landscape: boolean }): Promise<{ saved: boolean }>
+      openLogs(): Promise<void>
+      updateReady(): Promise<string | null>
+      installUpdate(): Promise<void>
+      onUpdateReady(listener: (version: string) => void): () => void
       restoreBackup(input: { path: string; recoveryCode: string }): Promise<RestoreResult>
     }
   }

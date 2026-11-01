@@ -8,7 +8,7 @@ export {
   type ProductRecord,
   type VariantRecord,
 } from './catalog.repo'
-export { classifyConstraintError, type ConstraintViolation } from './errors'
+export { classifyConstraintError, classifyStorageError, type ConstraintViolation } from './errors'
 export { newId } from './ids'
 export {
   purchasingRepo,
@@ -31,7 +31,7 @@ export {
   type ShiftRecord,
 } from './sales.repo'
 export { rolesRepo, sessionsRepo, usersRepo, type RoleRow, type UserRow } from './identity.repo'
-export { LATEST_MIGRATION, migrateTo, migrateToLatest } from './migrate'
+export { LATEST_MIGRATION, hasPendingUpgrade, migrateTo, migrateToLatest } from './migrate'
 export {
   attributesRepo,
   referenceRepo,

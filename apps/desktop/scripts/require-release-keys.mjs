@@ -7,7 +7,18 @@ if (!key || !key.includes('PUBLIC KEY')) {
   process.exit(1)
 }
 
+if (!process.env.MAIN_VITE_UPDATE_PUBLIC_KEY?.includes('PUBLIC KEY')) {
+  console.error('MAIN_VITE_UPDATE_PUBLIC_KEY is missing. Run the generate-update-key command once.')
+  process.exit(1)
+}
+
 const local = process.env.ALLOW_LOCAL_LICENSE_SERVER === '1' && url?.startsWith('http://127.0.0.1')
+
+if (process.env.MAIN_VITE_ALLOW_DEBUGGING && !local) {
+  console.error('MAIN_VITE_ALLOW_DEBUGGING is for local verification builds only.')
+  process.exit(1)
+}
+
 if (!url || (!url.startsWith('https://') && !local)) {
   console.error('MAIN_VITE_LICENSE_SERVER_URL must be the https address of the license server.')
   process.exit(1)

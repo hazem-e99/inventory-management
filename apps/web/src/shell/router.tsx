@@ -68,6 +68,7 @@ const routeTree = rootRoute.addChildren([
   page('/audit', () => import('../features/audit/audit-page'), 'AuditPage'),
   page('/backups', () => import('../features/backups/backups-page'), 'BackupsPage'),
   page('/settings', () => import('../features/settings/settings-page'), 'SettingsPage'),
+  page('/help', () => import('../features/help/help-page'), 'HelpPage'),
 ])
 
 export function createAppRouter(bootstrap: Bootstrap) {

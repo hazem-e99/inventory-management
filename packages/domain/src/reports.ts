@@ -4,6 +4,12 @@ const MILLI = 1000
 const toEpoch = (date: string): number => Date.parse(`${date}T00:00:00Z`)
 const toDate = (epoch: number): string => new Date(epoch).toISOString().slice(0, 10)
 
+/** The first moment of a shop's calendar day, in local time like `businessDate`. */
+export function localDayStart(date: string): number {
+  const [year, month, day] = date.split('-').map(Number) as [number, number, number]
+  return new Date(year, month - 1, day).getTime()
+}
+
 export const addDays = (date: string, days: number): string => toDate(toEpoch(date) + days * DAY_MS)
 
 export const daysBetween = (from: string, to: string): number => Math.round((toEpoch(to) - toEpoch(from)) / DAY_MS)

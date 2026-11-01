@@ -12,6 +12,16 @@ contextBridge.exposeInMainWorld('desktop', {
   print: (job: { deviceName: string | null; widthMm: number | null; heightMm: number | null }) =>
     ipcRenderer.invoke('print:run', job),
   savePdf: (job: { defaultName: string; landscape: boolean }) => ipcRenderer.invoke('print:pdf', job),
+  openLogs: () => ipcRenderer.invoke('logs:open'),
+  updateReady: () => ipcRenderer.invoke('update:ready'),
+  installUpdate: () => ipcRenderer.invoke('update:install'),
+  onUpdateReady: (listener: (version: string) => void) => {
+    const forward = (_event: unknown, version: string) => listener(version)
+    ipcRenderer.on('update:ready', forward)
+    return () => {
+      ipcRenderer.removeListener('update:ready', forward)
+    }
+  },
   restoreBackup: (input: { path: string; recoveryCode: string }) =>
     ipcRenderer.invoke('backup:restore', input),
 })

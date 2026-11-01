@@ -28,7 +28,7 @@ function cookiesFrom(response: Response): string {
     .join('; ')
 }
 
-export async function createHarness(options: { enrol?: boolean } = {}): Promise<Harness> {
+export async function createHarness(options: { enrol?: boolean; updatesDir?: string } = {}): Promise<Harness> {
   const db = new Kysely<LicenseDatabase>({ dialect: new PGliteDialect({ pglite: new PGlite() }) })
   await migrateLicenseDatabase(db)
   const authSettings = { db, secret: SECRET, publicUrl: PUBLIC_URL, limitRequests: false }
@@ -38,6 +38,7 @@ export async function createHarness(options: { enrol?: boolean } = {}): Promise<
   const time = { now: Date.UTC(2026, 5, 15) }
   const deps: ServerDeps = {
     db,
+    ...(options.updatesDir ? { updatesDir: options.updatesDir } : {}),
     auth: createAuth(authSettings),
     privateKey: keys.privateKey,
     serialKey: 'serial-key',

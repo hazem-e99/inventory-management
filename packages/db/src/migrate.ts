@@ -29,6 +29,12 @@ export async function migrateToLatest(db: Kysely<Database>): Promise<void> {
   if (error) throw error
 }
 
+/** True for a shop already in use with an older schema, and false for a new one. */
+export async function hasPendingUpgrade(db: Kysely<Database>): Promise<boolean> {
+  const migrations = await migratorFor(db).getMigrations()
+  return migrations.some(({ executedAt }) => executedAt) && migrations.some(({ executedAt }) => !executedAt)
+}
+
 /** Stops at an older schema, so a test can upgrade a shop that already has history. */
 export async function migrateTo(db: Kysely<Database>, name: string): Promise<void> {
   const { error } = await migratorFor(db).migrateTo(name)

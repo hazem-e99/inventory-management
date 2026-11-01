@@ -136,7 +136,7 @@ export async function pasteCode(page: Page, days: number): Promise<void> {
   await page.getByRole('button', { name: 'تفعيل بالكود' }).click()
 }
 
-const BARCODE = '4006381333931'
+export const BARCODE = '4006381333931'
 
 export async function importProduct(app: ElectronApplication, page: Page, directory: string): Promise<void> {
   const csv = join(directory, 'items.csv')

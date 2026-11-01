@@ -1,5 +1,5 @@
 import { issuesToFields, type ApiError, type ErrorCode, type RequestCode } from '@inv/contracts'
-import { classifyConstraintError } from '@inv/db'
+import { classifyConstraintError, classifyStorageError } from '@inv/db'
 import type { Context } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
@@ -22,6 +22,7 @@ const STATUS: Partial<Record<RequestCode, ContentfulStatusCode>> = {
   BACKUP_FAILED: 500,
   LICENSE_READ_ONLY: 403,
   LICENSE_SERVER_UNREACHABLE: 503,
+  DISK_FULL: 507,
 }
 
 export interface AppErrorOptions {
@@ -60,6 +61,7 @@ const CONSTRAINT_FIELDS: Record<string, [string, ErrorCode]> = {
 }
 
 function fromConstraint(error: unknown): AppError | null {
+  if (classifyStorageError(error)) return new AppError('DISK_FULL')
   const violation = classifyConstraintError(error)
   if (!violation) return null
   const field = violation.target ? CONSTRAINT_FIELDS[violation.target] : undefined

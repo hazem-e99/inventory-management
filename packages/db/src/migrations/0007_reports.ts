@@ -63,6 +63,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
+  await db.deleteFrom('role_permissions').where('permission', 'in', ['reports.view', 'reports.profit']).execute()
   await db.schema.dropIndex('sale_lines_report_idx').execute()
   await db.schema.alterTable('sale_lines').dropColumn('is_return').execute()
   await db.schema.alterTable('sale_lines').dropColumn('report_date').execute()

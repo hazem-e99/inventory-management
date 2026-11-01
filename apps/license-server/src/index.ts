@@ -23,6 +23,7 @@ const app = createServerApp({
   privateKey: config.LICENSE_PRIVATE_KEY,
   serialKey: config.SERIAL_HMAC_KEY,
   publicUrl: config.PUBLIC_URL,
+  updatesDir: config.UPDATES_DIR,
   clock: () => Date.now(),
   trustProxy: config.TRUST_PROXY === 'true',
   logError: (message, details) => console.error(message, details),

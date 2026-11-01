@@ -4,6 +4,9 @@
 
 - [الخطة الكاملة](docs/PLAN.md)
 - [سجل القرارات](docs/decisions.md)
+- [قائمة القبول قبل أول عميل](docs/acceptance.md)
+- [تشغيل سيرفر التراخيص والتحديثات](docs/license-server.md)
+- [سجل الإصدارات](CHANGELOG.md)
 - [حقائق المنتج](PRODUCT.md)
 - [نظام التصميم](DESIGN.md)
 
@@ -39,4 +42,4 @@ pnpm bench
 pnpm dist
 ```
 
-الـ Installer بيطلع في `apps/desktop/release`.
+الـ Installer بيطلع في `apps/desktop/release`، والأمر محتاج مفاتيح الإصدار: راجع [تشغيل سيرفر التراخيص](docs/license-server.md).

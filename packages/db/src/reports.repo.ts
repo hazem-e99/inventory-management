@@ -1,3 +1,4 @@
+import { addDays, localDayStart } from '@inv/domain'
 import { sql, type Kysely } from 'kysely'
 import type { Database } from './schema'
 
@@ -114,7 +115,9 @@ export function reportsRepo(db: Kysely<Database>) {
           'stock.value_minor',
         ])
         .where('stock.qty_milli', '<>', 0)
+        // Follows products_name_idx, so a page stops early instead of sorting every item.
         .orderBy('product.name')
+        .orderBy('product.id')
         .orderBy('stock.variant_id')
         .limit(limit)
         .offset(offset)
@@ -310,7 +313,7 @@ export function reportsRepo(db: Kysely<Database>) {
         .select(['stock.variant_id', 'variant.product_id', 'product.name', 'variant.label', 'stock.qty_milli', 'stock.value_minor'])
         .where('stock.qty_milli', '>', 0)
         .where('recent.variant_id', 'is', null)
-        .where('variant.created_at', '<', Date.parse(`${cutoff}T00:00:00Z`))
+        .where('variant.created_at', '<', localDayStart(cutoff))
         .orderBy('stock.value_minor', 'desc')
         .orderBy('stock.variant_id')
         .limit(limit)
@@ -385,8 +388,8 @@ export function reportsRepo(db: Kysely<Database>) {
     },
 
     async shifts({ from, to }: Range) {
-      const start = Date.parse(`${from}T00:00:00Z`)
-      const end = Date.parse(`${to}T23:59:59.999Z`)
+      const start = localDayStart(from)
+      const end = localDayStart(addDays(to, 1))
 
       const shifts = await db
         .selectFrom('shifts')
@@ -394,7 +397,7 @@ export function reportsRepo(db: Kysely<Database>) {
         .selectAll('shifts')
         .select('users.full_name as cashier')
         .where('shifts.opened_at', '>=', start)
-        .where('shifts.opened_at', '<=', end)
+        .where('shifts.opened_at', '<', end)
         .orderBy('shifts.opened_at', 'desc')
         .execute()
 

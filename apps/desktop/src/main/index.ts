@@ -7,8 +7,11 @@ import {
   BrowserWindow,
   dialog,
   ipcMain,
+  Menu,
   net,
   protocol,
+  session,
+  shell,
   utilityProcess,
   type IpcMainInvokeEvent,
   type UtilityProcess,
@@ -17,8 +20,10 @@ import type { StartOptions } from '@inv/api'
 import { LATEST_MIGRATION } from '@inv/db'
 import type { ApiProcessEvent, ApiProcessRequest } from './api-process'
 import { DatabaseKeyUnavailable, loadDatabaseKey, storeDatabaseKey } from './database-key'
-import { licenseConfig } from './license-config'
+import { fileLogger } from '@inv/api/log'
+import { licenseConfig, updateConfig } from './license-config'
 import { restoreBackup } from './restore'
+import { startUpdates, type Updater } from './updates'
 
 const RENDERER_ORIGIN = 'app://renderer'
 const API_START_TIMEOUT_MS = 15_000
@@ -44,6 +49,13 @@ let apiProcess: UtilityProcess | undefined
 let startup: Startup = { kind: 'restore-required' }
 let quitting = false
 let restarting = false
+let updater: Updater | undefined
+
+process.on('uncaughtException', (error) => {
+  fileLogger(paths().logs)('App crashed', { message: error.message, stack: error.stack })
+  dialog.showErrorBox('Inventory', error.message)
+  app.exit(1)
+})
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true } },
@@ -55,6 +67,8 @@ const paths = () => {
     database: join(userData, 'inventory.db'),
     key: join(userData, 'db.key'),
     backups: join(userData, 'backups'),
+    logs: join(userData, 'logs'),
+    updates: join(userData, 'updates'),
   }
 }
 
@@ -113,13 +127,14 @@ function stopApi(): Promise<void> {
 }
 
 async function startApi(): Promise<void> {
-  const { database, key, backups } = paths()
+  const { database, key, backups, logs } = paths()
   const hexKey = loadDatabaseKey(key, database)
   const token = randomBytes(32).toString('hex')
 
   const port = await forkApi({
     database: { path: database, hexKey },
     backupsDir: backups,
+    logsDir: logs,
     token,
     allowedOrigin,
     version: app.getVersion(),
@@ -184,6 +199,16 @@ function registerIpc(): void {
       filters: [{ name: 'Excel', extensions: ['xlsx'] }],
     })
     return result.canceled ? null : (result.filePath ?? null)
+  })
+
+  handle('logs:open', async () => {
+    await shell.openPath(paths().logs)
+  })
+
+  handle('update:ready', () => updater?.readyVersion() ?? null)
+
+  handle('update:install', () => {
+    if (updater?.install(true)) app.quit()
   })
 
   handle('print:printers', async (event) => {
@@ -288,11 +313,13 @@ async function createWindow(): Promise<void> {
       contextIsolation: true,
       sandbox: true,
       nodeIntegration: false,
+      devTools: !app.isPackaged,
     },
   })
 
   window.once('ready-to-show', () => window.show())
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  window.webContents.on('will-attach-webview', (event) => event.preventDefault())
   window.webContents.on('will-navigate', (event, url) => {
     const allowed = devServerUrl ?? RENDERER_ORIGIN
     if (!url.startsWith(allowed)) event.preventDefault()
@@ -301,7 +328,41 @@ async function createWindow(): Promise<void> {
   await window.loadURL(devServerUrl ?? `${RENDERER_ORIGIN}/`)
 }
 
+/** A customer's copy opens for its window and nothing else. */
+function lockDown(): void {
+  // The app asks the browser for nothing but putting a code on the clipboard.
+  session.defaultSession.setPermissionRequestHandler((_contents, permission, allow) => allow(permission === 'clipboard-sanitized-write'))
+  session.defaultSession.setPermissionCheckHandler((_contents, permission) => permission === 'clipboard-sanitized-write')
+  if (!app.isPackaged) return
+
+  // No menu means no reload, zoom or developer tools by shortcut, in the middle of a sale or not.
+  Menu.setApplicationMenu(null)
+}
+
+function debuggingRequested(): boolean {
+  return ['remote-debugging-port', 'remote-debugging-pipe', 'inspect', 'inspect-brk'].some((name) => app.commandLine.hasSwitch(name))
+}
+
+function checkForUpdates(): void {
+  const config = updateConfig(app.isPackaged)
+  if (!config) return
+
+  updater = startUpdates({
+    ...config,
+    currentVersion: app.getVersion(),
+    folder: paths().updates,
+    log: fileLogger(paths().logs),
+    onReady: (version) => BrowserWindow.getAllWindows()[0]?.webContents.send('update:ready', version),
+  })
+}
+
 async function bootstrap(): Promise<void> {
+  if (app.isPackaged && debuggingRequested() && !import.meta.env.MAIN_VITE_ALLOW_DEBUGGING) {
+    app.quit()
+    return
+  }
+
+  lockDown()
   registerIpc()
   registerRendererProtocol()
 
@@ -313,6 +374,7 @@ async function bootstrap(): Promise<void> {
   }
 
   await createWindow()
+  checkForUpdates()
 }
 
 if (!app.requestSingleInstanceLock()) {
@@ -331,6 +393,8 @@ if (!app.requestSingleInstanceLock()) {
     if (quitting || !apiProcess) return
     event.preventDefault()
     quitting = true
+    // Closing up at night is the natural moment: the next morning opens on the new version.
+    updater?.install(false)
     void stopApi().finally(() => app.quit())
   })
 
