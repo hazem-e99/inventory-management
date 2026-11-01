@@ -199,6 +199,7 @@ export interface StockMovementsTable {
   value_minor: number
   document_id: string
   document_type: string
+  document_number: string | null
   reversal_of: string | null
   actor_id: string | null
 }
@@ -217,8 +218,129 @@ export interface VariantStockTable {
   value_minor: number
 }
 
+export interface SuppliersTable {
+  id: string
+  name: string
+  phone: string | null
+  address: string | null
+  tax_number: string | null
+  notes: string | null
+  search_text: string
+  balance_minor: Generated<number>
+  archived_at: number | null
+  created_at: number
+  updated_at: number
+}
+
+export interface SupplierLedgerTable {
+  id: string
+  supplier_id: string
+  occurred_at: number
+  business_date: string
+  amount_minor: number
+  balance_after_minor: number
+  source: string
+  document_id: string
+  document_number: string | null
+  reversal_of: string | null
+  actor_id: string | null
+}
+
+export interface PurchaseOrdersTable {
+  id: string
+  number: string | null
+  status: string
+  supplier_id: string
+  warehouse_id: string
+  expected_date: string | null
+  notes: string | null
+  created_by: string | null
+  created_at: number
+}
+
+export interface PurchaseOrderLinesTable {
+  id: string
+  order_id: string
+  position: number
+  variant_id: string
+  unit_id: string
+  qty_milli: number
+  unit_cost_minor: number
+  ordered_base_milli: Generated<number>
+  received_base_milli: Generated<number>
+}
+
+export interface PurchaseDocumentsTable {
+  id: string
+  kind: string
+  status: string
+  number: string | null
+  supplier_id: string
+  warehouse_id: string
+  order_id: string | null
+  supplier_reference: string | null
+  notes: string | null
+  paid_minor: number
+  payment_method: string | null
+  business_date: string | null
+  created_by: string | null
+  created_at: number
+  posted_at: number | null
+  voided_at: number | null
+}
+
+export interface PurchaseDocumentLinesTable {
+  id: string
+  document_id: string
+  position: number
+  variant_id: string
+  unit_id: string
+  qty_milli: number
+  unit_cost_minor: number
+  discount_minor: number
+  tax_rate_bp: number
+  lot_id: string | null
+  lot_no: string | null
+  expiry_date: string | null
+  serials: string | null
+  order_line_id: string | null
+}
+
+export interface SupplierPaymentsTable {
+  id: string
+  number: string
+  supplier_id: string
+  amount_minor: number
+  method: string
+  reference: string | null
+  notes: string | null
+  status: string
+  purchase_id: string | null
+  created_by: string | null
+  created_at: number
+  voided_at: number | null
+}
+
+export interface SerialsTable {
+  id: string
+  variant_id: string
+  serial: string
+  status: string
+  warehouse_id: string
+  purchase_id: string | null
+  created_at: number
+}
+
 export interface Database {
   settings: SettingsTable
+  suppliers: SuppliersTable
+  supplier_ledger: SupplierLedgerTable
+  purchase_orders: PurchaseOrdersTable
+  purchase_order_lines: PurchaseOrderLinesTable
+  purchase_documents: PurchaseDocumentsTable
+  purchase_document_lines: PurchaseDocumentLinesTable
+  supplier_payments: SupplierPaymentsTable
+  serials: SerialsTable
   warehouses: NamedReferenceTable
   lots: LotsTable
   stock_documents: StockDocumentsTable

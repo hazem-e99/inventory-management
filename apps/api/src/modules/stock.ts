@@ -14,6 +14,7 @@ import {
   stockPickQuerySchema,
   type Actor,
   type AdjustmentReason,
+  type MovementSource,
   type StockDocument,
   type StockDocumentKind,
   type StockDocumentRow,
@@ -21,7 +22,6 @@ import {
 } from '@inv/contracts'
 import {
   auditRepo,
-  InsufficientStock,
   newId,
   nextSequence,
   stockLedger,
@@ -31,13 +31,13 @@ import {
   type LedgerContext,
   type StockDocumentRecord,
 } from '@inv/db'
-import { averageCostMinor, businessDate, quantityToText } from '@inv/domain'
+import { averageCostMinor, businessDate } from '@inv/domain'
 import type { AppDeps } from '../http/context'
 import { AppError } from '../http/errors'
 import { jsonBody, jsonOk, router } from '../http/routing'
 import { requireAuth, requirePasswordCurrent, requirePermission } from '../http/session'
 import { storeSettings } from './store'
-import { postDocument } from './stock-posting'
+import { postDocument, withShortageExplained } from './stock-posting'
 
 const params = z.object({ id: z.string() })
 
@@ -89,18 +89,6 @@ async function loadDocument(db: Kysely<Database>, id: string): Promise<StockDocu
       trackLots: line.track_lots === 1,
     })),
   }
-}
-
-/** A refused movement names the item and the amounts, not just "not enough stock". */
-async function explainShortage(db: Kysely<Database>, error: InsufficientStock): Promise<AppError> {
-  const rules = await stockRepo(db).variantRules([error.variantId])
-  return new AppError('STOCK_INSUFFICIENT', {
-    params: {
-      item: rules.get(error.variantId)?.productName ?? '',
-      available: quantityToText(Math.max(error.availableMilli, 0)),
-      requested: quantityToText(error.requestedMilli),
-    },
-  })
 }
 
 export function stockRoutes(deps: AppDeps) {
@@ -197,26 +185,23 @@ export function stockRoutes(deps: AppDeps) {
     responses: { 200: jsonOk(stockMovementPageSchema) },
   })
 
-  async function ledgerContext(documentId: string, documentType: string, actor: Actor): Promise<LedgerContext> {
+  async function ledgerContext(
+    documentId: string,
+    documentType: string,
+    actor: Actor,
+    documentNumber: string | null,
+  ): Promise<LedgerContext> {
     const now = deps.clock()
     const { allowNegative } = await storeSettings(deps.db).stockPolicy()
     return {
       documentId,
       documentType,
+      documentNumber,
       actorId: actor.id,
       occurredAt: now,
       businessDate: businessDate(now),
       // Both are needed: the shop must allow it, and this person must be trusted with it.
       allowNegative: allowNegative && actor.permissions.includes('stock.negative'),
-    }
-  }
-
-  async function withShortageExplained<T>(run: () => Promise<T>): Promise<T> {
-    try {
-      return await run()
-    } catch (error) {
-      if (error instanceof InsufficientStock) throw await explainShortage(deps.db, error)
-      throw error
     }
   }
 
@@ -338,11 +323,17 @@ export function stockRoutes(deps: AppDeps) {
       if (!document) throw new AppError('NOT_FOUND')
       if (document.status !== 'draft') throw new AppError('DOCUMENT_NOT_DRAFT')
 
-      const context = await ledgerContext(id, document.kind, actor)
+      const base = await ledgerContext(id, document.kind, actor, null)
       const { expiryRequired } = await storeSettings(deps.db).features()
 
-      await withShortageExplained(() =>
+      await withShortageExplained(deps.db, () =>
         deps.db.transaction().execute(async (trx) => {
+          // Numbered first so every movement carries it. A rollback gives the number back.
+          const kind = document.kind as StockDocumentKind
+          const sequence = await nextSequence(trx, `document:${kind}`)
+          const number = `${STOCK_DOCUMENT_PREFIX[kind]}-${String(sequence).padStart(6, '0')}`
+          const context = { ...base, documentNumber: number }
+
           await postDocument(trx, document, {
             now: context.occurredAt,
             today: context.businessDate,
@@ -350,12 +341,9 @@ export function stockRoutes(deps: AppDeps) {
             context,
           })
 
-          // Numbered last and inside the transaction, so a refused post burns no number.
-          const kind = document.kind as StockDocumentKind
-          const sequence = await nextSequence(trx, `document:${kind}`)
           await stockRepo(trx).updateDocument(id, {
             status: 'posted',
-            number: `${STOCK_DOCUMENT_PREFIX[kind]}-${String(sequence).padStart(6, '0')}`,
+            number,
             business_date: context.businessDate,
             posted_at: context.occurredAt,
           })
@@ -378,9 +366,9 @@ export function stockRoutes(deps: AppDeps) {
       if (!document) throw new AppError('NOT_FOUND')
       if (document.status !== 'posted') throw new AppError('DOCUMENT_NOT_POSTED')
 
-      const context = await ledgerContext(id, document.kind, actor)
+      const context = await ledgerContext(id, document.kind, actor, document.number)
 
-      await withShortageExplained(() =>
+      await withShortageExplained(deps.db, () =>
         deps.db.transaction().execute(async (trx) => {
           await stockLedger(trx, context).reverse(id)
           await stockRepo(trx).updateDocument(id, { status: 'voided', voided_at: context.occurredAt })
@@ -450,7 +438,7 @@ export function stockRoutes(deps: AppDeps) {
             qtyMilli: Number(row.qty_milli),
             valueMinor: Number(row.value_minor),
             documentId: row.document_id,
-            documentKind: row.document_type as StockDocumentKind,
+            documentKind: row.document_type as MovementSource,
             documentNumber: row.document_number,
             reversal: row.reversal_of !== null,
             actorName: row.full_name,

@@ -19,6 +19,7 @@ export class InsufficientStock extends Error {
 export interface LedgerContext {
   documentId: string
   documentType: string
+  documentNumber: string | null
   actorId: string | null
   occurredAt: number
   businessDate: string
@@ -86,6 +87,7 @@ export function stockLedger(db: Kysely<Database>, context: LedgerContext) {
         value_minor: valueMinor,
         document_id: context.documentId,
         document_type: context.documentType,
+        document_number: context.documentNumber,
         reversal_of: reversalOf,
         actor_id: context.actorId,
       })

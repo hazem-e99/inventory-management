@@ -11,10 +11,12 @@ import { backupRoutes } from './modules/backups'
 import { catalogFileRoutes } from './modules/catalog-import'
 import { onboardingRoutes } from './modules/onboarding'
 import { productRoutes } from './modules/products'
+import { purchaseRoutes } from './modules/purchases'
 import { referenceRoutes } from './modules/reference'
 import { rolesRoutes } from './modules/roles'
 import { settingsRoutes } from './modules/settings'
 import { stockRoutes } from './modules/stock'
+import { supplierRoutes } from './modules/suppliers'
 import { usersRoutes } from './modules/users'
 
 function tokenMatches(header: string | undefined, token: string): boolean {
@@ -75,6 +77,8 @@ export function createApp(deps: AppDeps) {
   app.route('/', stockRoutes(deps))
   app.route('/', productRoutes(deps))
   app.route('/', referenceRoutes(deps))
+  app.route('/', supplierRoutes(deps))
+  app.route('/', purchaseRoutes(deps))
 
   app.doc('/openapi.json', {
     openapi: '3.1.0',

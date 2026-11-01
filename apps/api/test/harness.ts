@@ -23,6 +23,14 @@ export interface Harness {
   failure(method: string, path: string, options?: { session?: string; body?: unknown }): Promise<ApiError>
 }
 
+const cleanups: Array<() => Promise<void>> = []
+
+// Registered once per test file: `afterAll` inside a running test, as a property test would
+// reach it, is silently ignored, and every run would leave a database behind.
+afterAll(async () => {
+  await Promise.all(cleanups.splice(0).map((cleanup) => cleanup()))
+})
+
 export async function createHarness(): Promise<Harness> {
   const dir = mkdtempSync(join(tmpdir(), 'inv-api-'))
   const hexKey = randomBytes(32).toString('hex')
@@ -43,7 +51,7 @@ export async function createHarness(): Promise<Harness> {
   }
   const app = createApp(deps)
 
-  afterAll(async () => {
+  cleanups.push(async () => {
     await db.destroy()
     rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 })
   })

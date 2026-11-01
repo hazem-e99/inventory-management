@@ -11,6 +11,7 @@ export interface VariantRule {
   productName: string
   baseUnitId: string
   trackLots: boolean
+  trackSerials: boolean
   allowsFraction: boolean
   costMinor: number
   onHandMilli: number
@@ -205,6 +206,7 @@ export function stockRepo(db: Kysely<Database>) {
           'product.name',
           'product.base_unit_id',
           'product.track_lots',
+          'product.track_serials',
           'units.allows_fraction',
           'stock.qty_milli',
           'stock.value_minor',
@@ -225,6 +227,7 @@ export function stockRepo(db: Kysely<Database>) {
             productName: row.name,
             baseUnitId: row.base_unit_id,
             trackLots: row.track_lots === 1,
+            trackSerials: row.track_serials === 1,
             allowsFraction: row.allows_fraction === 1,
             costMinor: Number(row.cost_minor),
             onHandMilli: Number(row.qty_milli ?? 0),
@@ -254,6 +257,7 @@ export function stockRepo(db: Kysely<Database>) {
         .innerJoin('products as product', 'product.id', 'variant.product_id')
         .innerJoin('units', 'units.id', 'product.base_unit_id')
         .leftJoin('variant_stock as stock', 'stock.variant_id', 'variant.id')
+        .leftJoin('tax_rates as tax', 'tax.id', 'product.tax_rate_id')
         .select([
           'variant.id',
           'variant.label',
@@ -263,6 +267,8 @@ export function stockRepo(db: Kysely<Database>) {
           'product.name',
           'product.base_unit_id',
           'product.track_lots',
+          'product.track_serials',
+          'tax.rate_bp',
           'units.allows_fraction',
           'stock.qty_milli',
         ])
@@ -298,6 +304,8 @@ export function stockRepo(db: Kysely<Database>) {
         unitId: scanned?.variant_id === row.id ? scanned.unit_id : row.base_unit_id,
         allowsFraction: row.allows_fraction === 1,
         trackLots: row.track_lots === 1,
+        trackSerials: row.track_serials === 1,
+        taxRateBp: row.rate_bp ?? 0,
         onHandMilli: Number(row.qty_milli ?? 0),
         costMinor: Number(row.cost_minor),
         units: conversions
@@ -359,7 +367,6 @@ export function stockRepo(db: Kysely<Database>) {
         .innerJoin('warehouses', 'warehouses.id', 'movement.warehouse_id')
         .leftJoin('lots', 'lots.id', 'movement.lot_id')
         .leftJoin('users', 'users.id', 'movement.actor_id')
-        .leftJoin('stock_documents as document', 'document.id', 'movement.document_id')
         .select([
           'movement.id',
           'movement.occurred_at',
@@ -367,12 +374,12 @@ export function stockRepo(db: Kysely<Database>) {
           'movement.value_minor',
           'movement.document_id',
           'movement.document_type',
+          'movement.document_number',
           'movement.reversal_of',
           'variant.label',
           'warehouses.name as warehouse_name',
           'lots.lot_no',
           'users.full_name',
-          'document.number as document_number',
         ])
         .where('variant.product_id', '=', productId)
         .$if(cursor !== null, (query) =>

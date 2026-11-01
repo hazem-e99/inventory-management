@@ -1,6 +1,7 @@
 export * from './amounts'
 export * from './barcode'
 export * from './presets'
+export * from './purchasing'
 export * from './roles'
 export * from './stock'
 export * from './text'

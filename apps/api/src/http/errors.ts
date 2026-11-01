@@ -54,6 +54,7 @@ const CONSTRAINT_FIELDS: Record<string, [string, ErrorCode]> = {
   'roles.name': ['name', 'ROLE_NAME_TAKEN'],
   'product_variants.sku': ['sku', 'SKU_TAKEN'],
   'barcodes.code': ['barcode', 'BARCODE_TAKEN'],
+  'suppliers.name': ['name', 'SUPPLIER_NAME_TAKEN'],
 }
 
 function fromConstraint(error: unknown): AppError | null {

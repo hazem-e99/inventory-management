@@ -1,4 +1,4 @@
-import { readFileSync, rmSync } from 'node:fs'
+import { readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { _electron as electron, expect, type ElectronApplication, type Page } from '@playwright/test'
 
@@ -96,4 +96,25 @@ export async function completeOnboarding(page: Page, business: RegExp = /صيد�
   await start.click()
   await expect(page.getByRole('heading', { name: 'أهلاً، حازم عصام' })).toBeVisible()
   return code
+}
+
+const BARCODE = '4006381333931'
+
+export async function importProduct(app: ElectronApplication, page: Page, directory: string): Promise<void> {
+  const csv = join(directory, 'items.csv')
+  writeFileSync(csv, `اسم الصنف,الباركود,سعر البيع\nبنادول اكسترا,${BARCODE},45.5\n`)
+  await chooseFile(app, csv)
+  await page.getByRole('link', { name: 'الأصناف', exact: true }).click()
+  await page.getByRole('button', { name: 'استيراد من ملف' }).click()
+  await page.getByRole('button', { name: 'اختيار ملف' }).click()
+  await page.getByRole('button', { name: 'استيراد 1 صنف' }).click()
+  await expect(page.getByRole('link', { name: 'بنادول اكسترا' })).toBeVisible()
+}
+
+/** Types the code and presses Enter, exactly as a keyboard-wedge scanner does. */
+export async function scan(page: Page): Promise<void> {
+  const picker = page.getByRole('searchbox', { name: /امسح الباركود/ })
+  await picker.fill(BARCODE)
+  await picker.press('Enter')
+  await expect(picker).toHaveValue('')
 }

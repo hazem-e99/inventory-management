@@ -17,6 +17,7 @@ function MovementRow({ movement }: { movement: StockMovement }) {
   const { t } = useTranslation()
   const format = useFormat()
   const incoming = movement.qtyMilli > 0
+  const purchased = movement.documentKind === 'purchase' || movement.documentKind === 'purchase_return'
 
   return (
     <div role="row" className={`${COLUMNS} h-full border-b border-rule text-sm hover:bg-ground`}>
@@ -24,7 +25,11 @@ function MovementRow({ movement }: { movement: StockMovement }) {
         {format.dateTime(movement.occurredAt)}
       </div>
       <div role="cell" className="truncate">
-        <Link to="/stock/$id" params={{ id: movement.documentId }} className="text-ink hover:text-route">
+        <Link
+          to={purchased ? '/purchases/$id' : '/stock/$id'}
+          params={{ id: movement.documentId }}
+          className="text-ink hover:text-route"
+        >
           {t(`stock.kinds.${movement.documentKind}`)} <bdi dir="ltr">{movement.documentNumber}</bdi>
         </Link>
         {movement.reversal && (

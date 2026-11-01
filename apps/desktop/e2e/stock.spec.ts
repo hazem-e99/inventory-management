@@ -1,29 +1,8 @@
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { expect, test, type ElectronApplication, type Page } from '@playwright/test'
-import { chooseFile, cleanUp, completeOnboarding, expectAccessible, launch } from './helpers'
-
-const BARCODE = '4006381333931'
-
-async function importProduct(app: ElectronApplication, page: Page, directory: string): Promise<void> {
-  const csv = join(directory, 'items.csv')
-  writeFileSync(csv, `اسم الصنف,الباركود,سعر البيع\nبنادول اكسترا,${BARCODE},45.5\n`)
-  await chooseFile(app, csv)
-  await page.getByRole('link', { name: 'الأصناف', exact: true }).click()
-  await page.getByRole('button', { name: 'استيراد من ملف' }).click()
-  await page.getByRole('button', { name: 'اختيار ملف' }).click()
-  await page.getByRole('button', { name: 'استيراد 1 صنف' }).click()
-  await expect(page.getByRole('link', { name: 'بنادول اكسترا' })).toBeVisible()
-}
-
-/** Types the code and presses Enter, exactly as a keyboard-wedge scanner does. */
-async function scan(page: Page): Promise<void> {
-  const picker = page.getByRole('searchbox', { name: /امسح الباركود/ })
-  await picker.fill(BARCODE)
-  await picker.press('Enter')
-  await expect(picker).toHaveValue('')
-}
+import { expect, test, type Page } from '@playwright/test'
+import { cleanUp, completeOnboarding, expectAccessible, importProduct, launch, scan } from './helpers'
 
 async function postDocument(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'ترحيل المستند' }).click()

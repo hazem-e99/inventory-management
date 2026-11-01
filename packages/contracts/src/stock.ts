@@ -111,6 +111,8 @@ export const stockPickRowSchema = z.object({
   unitId: z.string(),
   allowsFraction: z.boolean(),
   trackLots: z.boolean(),
+  trackSerials: z.boolean(),
+  taxRateBp: z.number(),
   onHandMilli: z.number(),
   costMinor: z.number(),
   units: z.array(z.object({ unitId: z.string(), factorMilli: z.number() })),
@@ -161,6 +163,9 @@ export const productStockSchema = z.object({
 
 export type ProductStock = z.infer<typeof productStockSchema>
 
+export const MOVEMENT_SOURCES = [...STOCK_DOCUMENT_KINDS, 'purchase', 'purchase_return'] as const
+export type MovementSource = (typeof MOVEMENT_SOURCES)[number]
+
 export const stockMovementSchema = z.object({
   id: z.string(),
   occurredAt: z.number(),
@@ -170,7 +175,7 @@ export const stockMovementSchema = z.object({
   qtyMilli: z.number(),
   valueMinor: z.number(),
   documentId: z.string(),
-  documentKind: z.enum(STOCK_DOCUMENT_KINDS),
+  documentKind: z.enum(MOVEMENT_SOURCES),
   documentNumber: z.string().nullable(),
   reversal: z.boolean(),
   actorName: z.string().nullable(),

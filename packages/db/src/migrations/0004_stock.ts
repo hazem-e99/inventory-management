@@ -1,5 +1,5 @@
 import { sql, type Kysely } from 'kysely'
-import { isSqlite } from '../dialect'
+import { dropAppendOnly, makeAppendOnly } from './append-only'
 
 const ROLE_GRANTS: Array<[string, string]> = [
   ['manager', 'stock.view'],
@@ -9,31 +9,6 @@ const ROLE_GRANTS: Array<[string, string]> = [
   ['storekeeper', 'stock.manage'],
   ['cashier', 'stock.view'],
 ]
-
-/** The ledger's promise, kept by the database itself: history is never rewritten. */
-async function makeAppendOnly(db: Kysely<any>): Promise<void> {
-  if (isSqlite(db)) {
-    for (const action of ['update', 'delete']) {
-      await sql
-        .raw(
-          `create trigger stock_movements_no_${action} before ${action} on stock_movements
-           begin select raise(abort, 'stock_movements is append-only'); end`,
-        )
-        .execute(db)
-    }
-    return
-  }
-
-  await sql`
-    create function stock_movements_append_only() returns trigger as $$
-    begin raise exception 'stock_movements is append-only'; end;
-    $$ language plpgsql
-  `.execute(db)
-  await sql`
-    create trigger stock_movements_no_change before update or delete on stock_movements
-    for each row execute function stock_movements_append_only()
-  `.execute(db)
-}
 
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
@@ -131,7 +106,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema.createIndex('stock_movements_warehouse_idx').on('stock_movements').column('warehouse_id').execute()
   await db.schema.createIndex('stock_movements_lot_idx').on('stock_movements').column('lot_id').execute()
 
-  await makeAppendOnly(db)
+  await makeAppendOnly(db, 'stock_movements')
 
   await db.schema
     .createTable('stock_balances')
@@ -173,7 +148,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  if (!isSqlite(db)) await sql`drop function stock_movements_append_only cascade`.execute(db)
+  await dropAppendOnly(db, 'stock_movements')
   for (const table of [
     'variant_stock',
     'stock_balances',

@@ -9,12 +9,22 @@ import {
   type StockDocumentRecord,
   type VariantRule,
 } from '@inv/db'
-import { allocateFefo, receiptValue, toBaseQuantity, type LotAllocation } from '@inv/domain'
+import { allocateFefo, quantityToText, receiptValue, toBaseQuantity, type LotAllocation } from '@inv/domain'
 import { AppError, fieldError } from '../http/errors'
 
 type Rules = Map<string, VariantRule>
 type Rule = VariantRule
 type Line = Awaited<ReturnType<ReturnType<typeof stockRepo>['linesOf']>>[number]
+
+/** The fields every kind of stock-moving line shares, whichever document it belongs to. */
+export interface LotLine {
+  variant_id: string
+  unit_id: string
+  qty_milli: number
+  lot_id: string | null
+  lot_no: string | null
+  expiry_date: string | null
+}
 
 export interface PostingOptions {
   now: number
@@ -23,9 +33,9 @@ export interface PostingOptions {
   context: LedgerContext
 }
 
-const lineField = (index: number, field: string, code: ErrorCode) => fieldError(`lines.${index}.${field}`, code)
+export const lineField = (index: number, field: string, code: ErrorCode) => fieldError(`lines.${index}.${field}`, code)
 
-function baseQuantity(line: Line, rule: Rule, index: number): number {
+export function baseQuantity(line: Pick<LotLine, 'unit_id' | 'qty_milli'>, rule: Rule, index: number): number {
   const magnitude = Math.abs(Number(line.qty_milli))
   const factor = line.unit_id === rule.baseUnitId ? 1000 : rule.factors.get(line.unit_id)
   if (factor === undefined) throw lineField(index, 'unitId', 'UNIT_CONVERSION_INVALID')
@@ -38,9 +48,9 @@ function baseQuantity(line: Line, rule: Rule, index: number): number {
 }
 
 /** Receipts name or create their batch; a batch with no expiry is refused where it matters. */
-async function receiptLot(
+export async function receiptLot(
   trx: Kysely<Database>,
-  line: Line,
+  line: LotLine,
   rule: Rule,
   index: number,
   options: PostingOptions,
@@ -57,16 +67,16 @@ async function receiptLot(
 }
 
 /** Refuses with the real total across batches, unless the shop lets stock go negative. */
-function assertCovered(line: Line, baseQty: number, planned: number, options: PostingOptions): void {
+export function assertCovered(line: LotLine, baseQty: number, planned: number, options: PostingOptions): void {
   if (planned < baseQty && !options.context.allowNegative) {
     throw new InsufficientStock(line.variant_id, null, planned, baseQty)
   }
 }
 
 /** A chosen batch is respected; otherwise the nearest expiry leaves first. */
-async function issueLots(
+export async function issueLots(
   trx: Kysely<Database>,
-  line: Line,
+  line: LotLine,
   rule: Rule,
   warehouseId: string,
   baseQty: number,
@@ -197,6 +207,27 @@ async function postCount(
       qtyMilli: delta,
       ...(delta > 0 ? { valueMinor: receiptValueOf(line, rule, delta) } : {}),
     })
+  }
+}
+
+/** A refused movement names the item and the amounts, not just "not enough stock". */
+async function explainShortage(db: Kysely<Database>, error: InsufficientStock): Promise<AppError> {
+  const rules = await stockRepo(db).variantRules([error.variantId])
+  return new AppError('STOCK_INSUFFICIENT', {
+    params: {
+      item: rules.get(error.variantId)?.productName ?? '',
+      available: quantityToText(Math.max(error.availableMilli, 0)),
+      requested: quantityToText(error.requestedMilli),
+    },
+  })
+}
+
+export async function withShortageExplained<T>(db: Kysely<Database>, run: () => Promise<T>): Promise<T> {
+  try {
+    return await run()
+  } catch (error) {
+    if (error instanceof InsufficientStock) throw await explainShortage(db, error)
+    throw error
   }
 }
 

@@ -12,6 +12,11 @@ export const PERMISSIONS = [
   'stock.manage',
   'stock.void',
   'stock.negative',
+  'purchases.view',
+  'purchases.manage',
+  'purchases.void',
+  'suppliers.manage',
+  'suppliers.pay',
 ] as const
 
 export type Permission = (typeof PERMISSIONS)[number]

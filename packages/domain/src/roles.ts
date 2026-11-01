@@ -15,8 +15,21 @@ export const SYSTEM_ROLE_DEFAULTS: Record<SystemRole, readonly Permission[]> = {
     'stock.view',
     'stock.manage',
     'stock.void',
+    'purchases.view',
+    'purchases.manage',
+    'purchases.void',
+    'suppliers.manage',
+    'suppliers.pay',
   ],
-  storekeeper: ['catalog.view', 'catalog.manage', 'catalog.import', 'stock.view', 'stock.manage'],
+  storekeeper: [
+    'catalog.view',
+    'catalog.manage',
+    'catalog.import',
+    'stock.view',
+    'stock.manage',
+    'purchases.view',
+    'purchases.manage',
+  ],
   cashier: ['catalog.view', 'stock.view'],
 }
 

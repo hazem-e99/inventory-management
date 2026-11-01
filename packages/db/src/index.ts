@@ -10,6 +10,16 @@ export {
 } from './catalog.repo'
 export { classifyConstraintError, type ConstraintViolation } from './errors'
 export { newId } from './ids'
+export {
+  purchasingRepo,
+  suppliersRepo,
+  type OrderLineRecord,
+  type OrderRecord,
+  type PurchaseLineRecord,
+  type PurchaseRecord,
+  type SupplierRecord,
+} from './purchasing.repo'
+export { supplierLedger, type SupplierLedgerContext } from './supplier.ledger'
 export { rolesRepo, sessionsRepo, usersRepo, type RoleRow, type UserRow } from './identity.repo'
 export { LATEST_MIGRATION, migrateToLatest } from './migrate'
 export {

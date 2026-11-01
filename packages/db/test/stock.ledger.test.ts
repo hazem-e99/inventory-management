@@ -22,6 +22,7 @@ function context(overrides: Partial<LedgerContext> = {}): LedgerContext {
   return {
     documentId: newId(),
     documentType: 'adjustment',
+    documentNumber: null,
     actorId: null,
     occurredAt: 1,
     businessDate: '2026-10-31',

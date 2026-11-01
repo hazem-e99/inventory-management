@@ -1,13 +1,13 @@
 import type { Bootstrap, Permission } from '@inv/contracts'
 import { Button, Menu, MenuItem, MenuLabel, MenuSeparator, Station } from '@inv/ui'
 import { Link, Outlet, useRouterState } from '@tanstack/react-router'
-import { Archive, ChevronsUpDown, ClipboardList, History, Home, KeyRound, LockKeyhole, LogOut, Package, Settings, ShieldCheck, Tags, Users } from 'lucide-react'
+import { Archive, ChevronsUpDown, ClipboardList, FileClock, History, Home, KeyRound, LockKeyhole, LogOut, Package, ReceiptText, Settings, ShieldCheck, Tags, Truck, Users } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AccountDialogs, type AccountPanel } from '../features/auth/account-dialogs'
 import { useActor, useSession } from '../lib/session'
 
-type NavKey = 'home' | 'products' | 'stock' | 'catalog' | 'users' | 'roles' | 'audit' | 'backups' | 'settings'
+type NavKey = 'home' | 'products' | 'stock' | 'purchases' | 'orders' | 'suppliers' | 'catalog' | 'users' | 'roles' | 'audit' | 'backups' | 'settings'
 
 interface NavItem {
   key: NavKey
@@ -20,6 +20,9 @@ const NAV: NavItem[] = [
   { key: 'home', to: '/', icon: <Home /> },
   { key: 'products', to: '/products', icon: <Package />, permission: 'catalog.view' },
   { key: 'stock', to: '/stock', icon: <ClipboardList />, permission: 'stock.view' },
+  { key: 'purchases', to: '/purchases', icon: <ReceiptText />, permission: 'purchases.view' },
+  { key: 'orders', to: '/orders', icon: <FileClock />, permission: 'purchases.view' },
+  { key: 'suppliers', to: '/suppliers', icon: <Truck />, permission: 'purchases.view' },
   { key: 'catalog', to: '/catalog', icon: <Tags />, permission: 'catalog.manage' },
   { key: 'users', to: '/users', icon: <Users />, permission: 'users.view' },
   { key: 'roles', to: '/roles', icon: <ShieldCheck />, permission: 'users.view' },
