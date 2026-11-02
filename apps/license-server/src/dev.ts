@@ -5,6 +5,7 @@ import { serve } from '@hono/node-server'
 import { PGlite } from '@electric-sql/pglite'
 import { generateLicenseKeys } from '@inv/license-core'
 import { Kysely, PGliteDialect } from 'kysely'
+import { geminiProvider } from './ai/gemini'
 import { createServerApp } from './app'
 import { createAuth, migrateAuthTables } from './auth'
 import { servePanel } from './panel'
@@ -31,6 +32,9 @@ const app = createServerApp({
   serialKey: randomBytes(32).toString('hex'),
   publicUrl,
   ...(process.env.UPDATES_DIR ? { updatesDir: process.env.UPDATES_DIR } : {}),
+  ...(process.env.GEMINI_API_KEY
+    ? { ai: { provider: geminiProvider(process.env.GEMINI_API_KEY, process.env.AI_INVOICE_MODEL ?? 'gemini-3.1-flash-lite'), dailyBudgetMicros: 1_000_000 } }
+    : {}),
   clock: () => Date.now(),
   trustProxy: false,
   logError: (message, details) => console.error(message, details),

@@ -10,6 +10,7 @@ import { authRoutes } from './modules/auth'
 import { backupRoutes } from './modules/backups'
 import { catalogFileRoutes } from './modules/catalog-import'
 import { customerRoutes } from './modules/customers'
+import { aiRoutes } from './modules/ai'
 import { licenseGuard, licenseRoutes } from './modules/license'
 import { onboardingRoutes } from './modules/onboarding'
 import { productRoutes } from './modules/products'
@@ -91,6 +92,7 @@ export function createApp(deps: AppDeps) {
   app.route('/', customerRoutes(deps))
   app.route('/', reportRoutes(deps))
   app.route('/', licenseRoutes(deps))
+  app.route('/', aiRoutes(deps))
 
   app.doc('/openapi.json', {
     openapi: '3.1.0',

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+export * from './ai'
 export * from './auth'
 export * from './backups'
 export * from './catalog'

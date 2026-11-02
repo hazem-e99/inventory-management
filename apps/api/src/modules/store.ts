@@ -21,6 +21,7 @@ const KEYS = {
   stockPolicy: 'stock_policy',
   pos: 'pos',
   license: 'license',
+  ai: 'ai',
 } as const
 
 const DEFAULT_PREFERENCES: Preferences = { locale: 'ar', theme: 'system', digits: 'latin' }
@@ -31,6 +32,17 @@ export interface StoredLicense {
   /** The latest moment this device has reached, so the clock can't be wound back. */
   lastSeenAt: number
 }
+
+export interface StoredAi {
+  enabled: boolean
+  /** Sent to the license server with each request. Null unless the add-on is on. */
+  key: string | null
+  monthlyLimit: number
+  used: number
+  consentedAt: number | null
+}
+
+const NO_AI: StoredAi = { enabled: false, key: null, monthlyLimit: 0, used: 0, consentedAt: null }
 
 /** Typed access to the settings rows. Reads are validated, since these outlive app versions. */
 export function storeSettings(db: Kysely<Database>) {
@@ -79,6 +91,12 @@ export function storeSettings(db: Kysely<Database>) {
     },
 
     setLicense: (license: StoredLicense, now: number) => settings.setJson(KEYS.license, license, now),
+
+    async ai(): Promise<StoredAi> {
+      return (await settings.getJson<StoredAi>(KEYS.ai)) ?? NO_AI
+    },
+
+    setAi: (ai: StoredAi, now: number) => settings.setJson(KEYS.ai, ai, now),
 
     recovery: () => settings.getJson<KeyEnvelope>(KEYS.recovery),
 

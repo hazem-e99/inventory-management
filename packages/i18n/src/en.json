@@ -337,7 +337,9 @@
     "customers.collect": "Collect customer payments",
     "shifts.manage": "Close other people's shifts",
     "reports.view": "View reports",
-    "reports.profit": "See cost, profit and stock value"
+    "reports.profit": "See cost, profit and stock value",
+    "ai.invoices": "Read invoices with AI",
+    "ai.assistant": "AI question assistant"
   },
   "audit": {
     "time": "Time",
@@ -392,7 +394,9 @@
       "customer.collected": "Customer payment",
       "customer.receipt_voided": "Customer receipt voided",
       "report.exported": "Report exported",
-      "license.activated": "License activated"
+      "license.activated": "License activated",
+      "ai.consent_given": "AI consent given",
+      "ai.consent_withdrawn": "AI consent withdrawn"
     }
   },
   "backups": {
@@ -565,7 +569,13 @@
     "LICENSE_STOPPED": "This license has been stopped. Contact us.",
     "LICENSE_RATE_LIMITED": "Too many attempts. Wait a minute and try again.",
     "LICENSE_SERVER_UNREACHABLE": "The license server can't be reached. Check the internet, or use an activation code.",
-    "DISK_FULL": "The disk is full, so nothing was saved. Free up some space and try again."
+    "DISK_FULL": "The disk is full, so nothing was saved. Free up some space and try again.",
+    "AI_NOT_ENABLED": "The AI add-on isn't on for this license.",
+    "AI_CONSENT_REQUIRED": "The shop owner needs to agree first, in Settings.",
+    "AI_QUOTA_EXCEEDED": "This month's AI allowance is used up. The rest of the app works as usual.",
+    "AI_OFFLINE": "This needs internet. The rest of the app works as usual.",
+    "AI_UNAVAILABLE": "The AI service isn't available right now. Try again shortly.",
+    "AI_UNREADABLE": "This file couldn't be read. Try a clearer picture."
   },
   "reference": {
     "tabs": {
@@ -1467,5 +1477,22 @@
         ]
       }
     }
+  },
+  "ai": {
+    "title": "AI",
+    "notEnabled": "An optional add-on that isn't on for this license. The rest of the app works without it, and nothing leaves your PC.",
+    "usage": "Used this month: {{used}} of {{limit}}",
+    "consented": "Agreed",
+    "withdraw": "Withdraw consent",
+    "reviewConsent": "Review consent",
+    "consentTitle": "Before you turn on AI",
+    "consentIntro": "This feature sends some data off this PC, so it needs your agreement first.",
+    "consentSent": "What leaves: only the invoice file you choose to read.",
+    "consentKept": "The file isn't stored on the app's server. Only the number of requests and their cost are recorded.",
+    "consentProcessor": "Reading is done by Google Gemini. Google keeps requests for a limited time to detect abuse, may process them outside Egypt, and doesn't use them to improve its products.",
+    "consentCustomers": "Your customers' names and numbers never leave this PC.",
+    "accept": "I agree",
+    "consentGiven": "Your consent is recorded",
+    "consentWithdrawn": "Your consent is withdrawn"
   }
 }

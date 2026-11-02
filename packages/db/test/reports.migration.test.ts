@@ -76,6 +76,27 @@ describe.each(dialects(dir))('telling an upgrade from a first run on %s', (_name
   })
 })
 
+describe.each(dialects(dir))('the AI permissions on %s', (_name, create) => {
+  it('arrive with their migration and leave with it', async () => {
+    const db = create()
+    const granted = async () => (await db.selectFrom('role_permissions').select('permission').where('permission', 'like', 'ai.%').execute()).length
+
+    // An existing shop: its roles came from onboarding, before this migration was written.
+    await migrateTo(db, '0007_reports')
+    await (db as Kysely<any>).insertInto('roles').values(['manager', 'storekeeper', 'cashier'].map((id) => ({ id, name: id, is_system: 1, created_at: 1 }))).execute()
+
+    await migrateToLatest(db)
+    expect(await granted()).toBe(3)
+
+    await migrateTo(db, '0007_reports')
+    expect(await granted()).toBe(0)
+
+    await migrateToLatest(db)
+    expect(await granted()).toBe(3)
+    await db.destroy()
+  })
+})
+
 describe.each(dialects(dir))('upgrading a shop with history on %s', (_name, create) => {
   let db: Kysely<Database>
 

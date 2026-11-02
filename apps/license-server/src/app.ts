@@ -3,6 +3,8 @@ import { Hono, type Context } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import type { Kysely } from 'kysely'
 import { adminRoutes } from './admin-routes'
+import type { AiProvider } from './ai/provider'
+import { aiRoutes } from './ai/routes'
 import type { Auth } from './auth'
 import { deviceRoutes } from './device-routes'
 import type { LicenseDatabase } from './schema'
@@ -14,6 +16,8 @@ export interface ServerDeps {
   serialKey: string
   publicUrl: string
   clock: () => number
+  /** Left out when AI is switched off: the one place to stop all spending at once. */
+  ai?: { provider: AiProvider; dailyBudgetMicros: number }
   /** Holds the installers and the signed manifest. Publishing is copying files here. */
   updatesDir?: string
   /** Behind Caddy the client address arrives in a header; without a proxy that header is a lie. */
@@ -28,7 +32,7 @@ export interface ServerEnv {
 export class ApiError extends HTTPException {
   constructor(
     readonly code: string,
-    status: 400 | 401 | 403 | 404 | 409 | 422 | 429,
+    status: 400 | 401 | 403 | 404 | 409 | 413 | 422 | 429 | 502 | 503,
   ) {
     super(status, { message: code })
   }
@@ -59,6 +63,7 @@ export function createServerApp(deps: ServerDeps) {
     app.use('/updates/*', serveStatic({ root, rewriteRequestPath: (path) => path.replace(/^\/updates/, '') }))
   }
   app.on(['GET', 'POST'], '/api/auth/*', (c) => deps.auth.handler(c.req.raw))
+  app.route('/v1/ai', aiRoutes(deps))
   app.route('/v1', deviceRoutes(deps))
   app.route('/admin', adminRoutes(deps))
 

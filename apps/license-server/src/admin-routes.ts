@@ -3,6 +3,7 @@ import { DURATION_UNITS, generateSerial, hashSerial, renewedExpiry, serialHint, 
 import { Hono } from 'hono'
 import { sql } from 'kysely'
 import { z } from 'zod'
+import { monthlyUsage, spentTodayMicros, usedThisMonth } from './ai/usage'
 import { ApiError, type ServerDeps, type ServerEnv } from './app'
 import { bindDevice, createLicense, recordEvent, tokenFor, type LicenseRecord } from './licenses'
 
@@ -34,6 +35,11 @@ const paymentSchema = z.object({
 
 const offlineSchema = z.object({ fingerprint: z.string().regex(/^[0-9a-f]{32}$/) })
 
+const aiSchema = z.object({
+  enabled: z.boolean(),
+  monthlyLimit: z.number().int().min(0).max(100_000),
+})
+
 async function bodyOf<T extends z.ZodType>(request: Request, schema: T): Promise<z.output<T>> {
   const parsed = schema.safeParse(await request.json().catch(() => null))
   if (!parsed.success) throw new ApiError('VALIDATION_FAILED', 422)
@@ -54,6 +60,8 @@ const toLicense = (row: LicenseRecord) => ({
   appVersion: row.app_version,
   lastSeenAt: row.last_seen_at === null ? null : Number(row.last_seen_at),
   notes: row.notes,
+  aiEnabled: row.ai_enabled,
+  aiMonthlyLimit: row.ai_monthly_limit,
   createdAt: Number(row.created_at),
 })
 
@@ -234,13 +242,15 @@ export function adminRoutes(deps: ServerDeps) {
 
   app.get('/licenses/:id', async (c) => {
     const license = await findLicense(c.req.param('id'))
-    const [customer, events] = await Promise.all([
+    const [customer, events, aiUsed] = await Promise.all([
       db.selectFrom('customers').select('name').where('id', '=', license.customer_id).executeTakeFirstOrThrow(),
       db.selectFrom('events').selectAll().where('license_id', '=', license.id).orderBy('id', 'desc').limit(LIST_LIMIT).execute(),
+      usedThisMonth(db, license.id, deps.clock()),
     ])
     return c.json({
       ...toLicense(license),
       customerName: customer.name,
+      aiUsed,
       events: events.map((event) => ({
         id: Number(event.id),
         occurredAt: Number(event.occurred_at),
@@ -319,6 +329,48 @@ export function adminRoutes(deps: ServerDeps) {
 
     const bound = await bindDevice(deps, license, { fingerprint, deviceName: 'offline' }, c.get('admin'))
     return c.json({ token: await tokenFor(deps, bound, fingerprint) })
+  })
+
+  app.put('/licenses/:id/ai', async (c) => {
+    const id = c.req.param('id')
+    const input = await bodyOf(c.req.raw, aiSchema)
+    const license = await findLicense(id)
+    if (license.state === 'revoked') throw new ApiError('LICENSE_REVOKED', 409)
+
+    const now = deps.clock()
+    const updated = await db
+      .updateTable('licenses')
+      .set({ ai_enabled: input.enabled, ai_monthly_limit: input.monthlyLimit, updated_at: now })
+      .where('id', '=', id)
+      .returningAll()
+      .executeTakeFirstOrThrow()
+    await recordEvent(db, now, { actor: c.get('admin'), action: 'license.ai_changed', customerId: license.customer_id, licenseId: id, details: input })
+    return c.json(toLicense(updated))
+  })
+
+  // The device picks up its new key at the next check-in. A copied key stops the moment this runs.
+  app.post('/licenses/:id/ai/rotate', async (c) => {
+    const id = c.req.param('id')
+    const license = await findLicense(id)
+    const now = deps.clock()
+    await db
+      .updateTable('licenses')
+      .set({ ai_key_version: license.ai_key_version + 1, updated_at: now })
+      .where('id', '=', id)
+      .execute()
+    await recordEvent(db, now, { actor: c.get('admin'), action: 'license.ai_key_rotated', customerId: license.customer_id, licenseId: id })
+    return c.json({ ok: true })
+  })
+
+  app.get('/ai/usage', async (c) => {
+    const now = deps.clock()
+    const [items, spentTodayMicrosValue] = await Promise.all([monthlyUsage(db, now), spentTodayMicros(db, now)])
+    return c.json({
+      enabled: Boolean(deps.ai),
+      dailyBudgetMicros: deps.ai?.dailyBudgetMicros ?? 0,
+      spentTodayMicros: spentTodayMicrosValue,
+      items,
+    })
   })
 
   app.post('/payments', async (c) => {
