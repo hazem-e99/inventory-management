@@ -12,7 +12,9 @@
     "build": "electron-vite build",
     "dist": "node scripts/require-release-keys.mjs && electron-vite build && electron-builder --win",
     "test:e2e": "electron-vite build && playwright test",
-    "publish-update": "node scripts/publish-update.mjs"
+    "publish-update": "node scripts/publish-update.mjs",
+    "demo": "tsx scripts/demo.mts",
+    "screens": "tsx scripts/demo-screens.mts"
   },
   "dependencies": {
     "better-sqlite3-multiple-ciphers": "^13.0.3",

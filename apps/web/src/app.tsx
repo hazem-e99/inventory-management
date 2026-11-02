@@ -1,7 +1,7 @@
 import { bootstrapSchema, type Bootstrap } from '@inv/contracts'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Toaster } from 'sonner'
 import { CrashBoundary, ErrorState, TopProgress } from './components/states'
@@ -32,7 +32,16 @@ const bootstrapQuery = {
 }
 
 function Authenticated({ bootstrap }: { bootstrap: Bootstrap }) {
-  const router = useMemo(() => createAppRouter(bootstrap), [bootstrap])
+  // One router for the session: a replacement starts with no screen, and Strict Mode leaves it there.
+  const [router] = useState(() => createAppRouter(bootstrap))
+  const applied = useRef(bootstrap)
+
+  useEffect(() => {
+    if (applied.current === bootstrap) return
+    applied.current = bootstrap
+    void router.invalidate()
+  }, [router, bootstrap])
+
   return <RouterProvider router={router} context={{ bootstrap }} />
 }
 

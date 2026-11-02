@@ -10,6 +10,7 @@
     "dev": "pnpm --filter @inv/desktop dev",
     "build": "pnpm --filter @inv/desktop build",
     "dist": "pnpm --filter @inv/desktop dist",
+    "demo": "pnpm --filter @inv/desktop demo",
     "typecheck": "pnpm -r typecheck",
     "test": "vitest run --project \"!bench\"",
     "test:db": "vitest run --project db",
