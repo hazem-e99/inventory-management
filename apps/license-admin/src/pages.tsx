@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import {
   api,
   errorMessage,
+  type AiUsage,
   type CustomerDetail,
   type CustomerRow,
   type DurationUnit,
@@ -31,6 +32,102 @@ const STATE_TONE: Record<License['state'], ComponentProps<typeof Badge>['tone']>
 function StateBadge({ license }: { license: Pick<License, 'state' | 'expiresAt'> }) {
   if (isLapsed(license)) return <Badge tone="danger">منتهي</Badge>
   return <Badge tone={STATE_TONE[license.state]}>{STATE_LABELS[license.state]}</Badge>
+}
+
+const dollars = (micros: number) => `$${(micros / 1_000_000).toFixed(4)}`
+
+function AiPanel({ license, onChange }: { license: LicenseDetail; onChange: () => void }) {
+  const fail = useFail()
+  const limitId = useId()
+  const [limit, setLimit] = useState(String(license.aiMonthlyLimit))
+
+  const save = useMutation({
+    mutationFn: (enabled: boolean) => api('PUT', `/admin/licenses/${license.id}/ai`, { enabled, monthlyLimit: Number(limit) }),
+    onSuccess: () => {
+      toast.success('تم الحفظ. يصل التغيير للجهاز عند اتصاله القادم.')
+      onChange()
+    },
+    onError: fail,
+  })
+  const rotate = useMutation({
+    mutationFn: () => api('POST', `/admin/licenses/${license.id}/ai/rotate`),
+    onSuccess: () => toast.success('تم تغيير المفتاح. القديم توقف الآن.'),
+    onError: fail,
+  })
+
+  return (
+    <section className="flex flex-col gap-2">
+      <h2 className="text-lg font-semibold text-ink">الذكاء الاصطناعي</h2>
+      <p className="text-ink-soft">
+        {license.aiEnabled ? `مفعل. الاستخدام هذا الشهر ${license.aiUsed} من ${license.aiMonthlyLimit}.` : 'غير مفعل لهذا الترخيص.'}
+      </p>
+      <div className="flex flex-wrap items-end gap-2">
+        <Field id={limitId} label="الحد الشهري">
+          <Input id={limitId} dir="ltr" inputMode="numeric" className="w-32" value={limit} onChange={(event) => setLimit(event.target.value.replace(/\D/g, ''))} />
+        </Field>
+        <Button loading={save.isPending} onClick={() => save.mutate(true)}>
+          {license.aiEnabled ? 'حفظ الحد' : 'تفعيل'}
+        </Button>
+        {license.aiEnabled && (
+          <>
+            <Button variant="secondary" onClick={() => save.mutate(false)}>
+              إيقاف
+            </Button>
+            <Button variant="secondary" loading={rotate.isPending} onClick={() => rotate.mutate()}>
+              تغيير المفتاح
+            </Button>
+          </>
+        )}
+      </div>
+    </section>
+  )
+}
+
+export function AiUsagePage() {
+  const usage = useQuery({ queryKey: ['ai-usage'], queryFn: () => api<AiUsage>('GET', '/admin/ai/usage') })
+
+  if (!usage.data) return <TableSkeleton />
+  const { enabled, spentTodayMicros, dailyBudgetMicros, items } = usage.data
+  const month = items.reduce((sum, row) => sum + row.costMicros, 0)
+
+  return (
+    <div className="flex flex-col gap-6">
+      <Sign title="استهلاك الذكاء الاصطناعي" secondary="AI usage" />
+      {!enabled && <p className="text-ink-soft">الخدمة متوقفة من إعدادات السيرفر.</p>}
+      <dl className="grid max-w-xl grid-cols-2 gap-4">
+        <Fact label="اليوم" value={`${dollars(spentTodayMicros)} من ${dollars(dailyBudgetMicros)}`} />
+        <Fact label="هذا الشهر" value={dollars(month)} />
+      </dl>
+      <Table>
+        <thead>
+          <tr>
+            <Th>العميل</Th>
+            <Th>الطلبات</Th>
+            <Th>الفاشلة</Th>
+            <Th>الحد</Th>
+            <Th>التكلفة</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((row) => (
+            <Tr key={row.licenseId}>
+              <Td>
+                <Link to="/licenses/$id" params={{ id: row.licenseId }} className="font-medium text-route">
+                  {row.customerName}
+                </Link>
+              </Td>
+              <Td>{row.requests}</Td>
+              <Td>{row.failures}</Td>
+              <Td>{row.monthlyLimit}</Td>
+              <Td>
+                <bdi dir="ltr">{dollars(row.costMicros)}</bdi>
+              </Td>
+            </Tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  )
 }
 
 function Fact({ label, value }: { label: string; value: ReactNode }) {
@@ -570,6 +667,8 @@ export function LicensePage() {
           </Button>
         </div>
       )}
+
+      {!stopped && <AiPanel key={data.aiMonthlyLimit} license={data} onChange={() => void refresh()} />}
 
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold text-ink">سجل الترخيص</h2>

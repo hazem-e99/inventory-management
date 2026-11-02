@@ -7,6 +7,7 @@ import * as stock from './migrations/0004_stock'
 import * as purchasing from './migrations/0005_purchasing'
 import * as sales from './migrations/0006_sales'
 import * as reports from './migrations/0007_reports'
+import * as ai from './migrations/0008_ai'
 import type { Database } from './schema'
 
 // Listed by hand so the bundled desktop build has no filesystem lookups.
@@ -18,6 +19,7 @@ const migrations: Record<string, Migration> = {
   '0005_purchasing': purchasing,
   '0006_sales': sales,
   '0007_reports': reports,
+  '0008_ai': ai,
 }
 
 export const LATEST_MIGRATION = Object.keys(migrations).sort().at(-1)!

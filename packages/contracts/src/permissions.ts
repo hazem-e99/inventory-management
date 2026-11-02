@@ -28,6 +28,8 @@ export const PERMISSIONS = [
   'shifts.manage',
   'reports.view',
   'reports.profit',
+  'ai.invoices',
+  'ai.assistant',
 ] as const
 
 export type Permission = (typeof PERMISSIONS)[number]

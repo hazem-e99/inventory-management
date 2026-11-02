@@ -1,13 +1,14 @@
 import { Button, Station } from '@inv/ui'
 import { useMutation } from '@tanstack/react-query'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { History, Home, LogOut, Users } from 'lucide-react'
+import { History, Home, LogOut, Sparkles, Users } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { api } from './api'
 
 const NAV = [
   { to: '/', label: 'الرئيسية', icon: <Home /> },
   { to: '/customers', label: 'العملاء', icon: <Users /> },
+  { to: '/ai', label: 'استهلاك الذكاء الاصطناعي', icon: <Sparkles /> },
   { to: '/events', label: 'سجل العمليات', icon: <History /> },
 ]
 

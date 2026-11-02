@@ -49,13 +49,34 @@ export interface License {
   appVersion: string | null
   lastSeenAt: number | null
   notes: string | null
+  aiEnabled: boolean
+  aiMonthlyLimit: number
   createdAt: number
 }
 
 export type DurationUnit = 'day' | 'week' | 'month' | 'year'
 
+export interface AiUsageRow {
+  licenseId: string
+  customerName: string
+  monthlyLimit: number
+  requests: number
+  failures: number
+  inputTokens: number
+  outputTokens: number
+  costMicros: number
+}
+
+export interface AiUsage {
+  enabled: boolean
+  dailyBudgetMicros: number
+  spentTodayMicros: number
+  items: AiUsageRow[]
+}
+
 export interface LicenseDetail extends License {
   customerName: string
+  aiUsed: number
   events: Array<{ id: number; occurredAt: number; actor: string; action: string; details: string | null }>
 }
 

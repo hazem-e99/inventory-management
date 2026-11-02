@@ -13,7 +13,7 @@ import { createRoot } from 'react-dom/client'
 import { Toaster } from 'sonner'
 import { ApiError, api, type Overview } from './api'
 import { Login, TotpSetup } from './auth-screens'
-import { CustomerPage, CustomersPage, EventsPage, LicensePage, OverviewPage } from './pages'
+import { AiUsagePage, CustomerPage, CustomersPage, EventsPage, LicensePage, OverviewPage } from './pages'
 import { Shell } from './shell'
 import './index.css'
 
@@ -52,6 +52,7 @@ const router = createRouter({
     page('/customers', CustomersPage),
     page('/customers/$id', CustomerPage),
     page('/licenses/$id', LicensePage),
+    page('/ai', AiUsagePage),
     page('/events', EventsPage),
   ]),
   history: createHashHistory(),

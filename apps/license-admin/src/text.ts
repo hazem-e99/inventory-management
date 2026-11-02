@@ -35,6 +35,8 @@ const ACTIONS: Record<string, string> = {
   'license.resumed': 'إعادة تشغيل',
   'license.revoked': 'إلغاء نهائي',
   'license.unbound': 'فك الربط بالجهاز',
+  'license.ai_changed': 'تعديل إضافة الذكاء الاصطناعي',
+  'license.ai_key_rotated': 'تغيير مفتاح الذكاء الاصطناعي',
   'license.reissued': 'إعادة إصدار السيريال',
   'payment.recorded': 'تسجيل دفعة',
 }

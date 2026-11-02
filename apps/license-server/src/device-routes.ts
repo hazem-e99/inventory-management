@@ -1,6 +1,7 @@
 import { hashSerial, normalizeSerial } from '@inv/license-core'
 import { Hono } from 'hono'
 import { z } from 'zod'
+import { deviceAiStatus } from './ai/routes'
 import { ApiError, clientAddress, type ServerDeps, type ServerEnv } from './app'
 import { bindDevice, tokenFor } from './licenses'
 import { rateLimiter } from './rate-limit'
@@ -71,7 +72,7 @@ export function deviceRoutes(deps: ServerDeps) {
       .where('id', '=', license.id)
       .execute()
 
-    return c.json({ status: 'ok' as const, token: await tokenFor(deps, license, input.fingerprint) })
+    return c.json({ status: 'ok' as const, token: await tokenFor(deps, license, input.fingerprint), ai: await deviceAiStatus(deps, license) })
   })
 
   return app

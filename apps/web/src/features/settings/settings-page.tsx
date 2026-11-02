@@ -27,6 +27,7 @@ import { desktop } from '../../lib/desktop'
 import { useReportError } from '../../lib/errors'
 import { usePreferences } from '../../lib/preferences'
 import { useCan } from '../../lib/session'
+import { AiSection } from '../ai/ai-section'
 import { referenceQuery, useReferenceName } from '../catalog/queries'
 import { settingsQuery } from './queries'
 
@@ -305,6 +306,7 @@ export function SettingsPage() {
             <StoreSection key={settings.store.name} settings={settings} />
             {canManage && <StockPolicySection settings={settings} />}
             {canManage && <PosSection settings={settings} />}
+            {canManage && <AiSection />}
           </>
         )}
       </QueryBoundary>

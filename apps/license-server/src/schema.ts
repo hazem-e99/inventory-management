@@ -28,6 +28,11 @@ export interface LicensesTable {
   app_version: string | null
   last_seen_at: number | null
   notes: string | null
+  ai_enabled: Generated<boolean>
+  /** Successful requests a month. The add-on is sold as this number. */
+  ai_monthly_limit: Generated<number>
+  /** Raised to cut off a key that got out, without touching anything else. */
+  ai_key_version: Generated<number>
   created_at: number
   updated_at: number
 }
@@ -54,11 +59,25 @@ export interface EventsTable {
   details: string | null
 }
 
+/** Counts and cost only. What a shop sent is never written down here. */
+export interface AiUsageTable {
+  id: Generated<number>
+  license_id: string
+  feature: string
+  model: string
+  input_tokens: number
+  output_tokens: number
+  cost_micros: number
+  succeeded: boolean
+  occurred_at: number
+}
+
 export interface LicenseDatabase {
   customers: CustomersTable
   licenses: LicensesTable
   payments: PaymentsTable
   events: EventsTable
+  ai_usage: AiUsageTable
 }
 
 /** Run at every start. Each step checks first, so a restart can never apply one twice. */
@@ -130,4 +149,25 @@ export async function migrateLicenseDatabase(db: Kysely<LicenseDatabase>): Promi
     .execute()
 
   await anyDb.schema.createIndex('events_license_idx').ifNotExists().on('events').column('license_id').execute()
+
+  await sql`alter table licenses add column if not exists ai_enabled boolean not null default false`.execute(db)
+  await sql`alter table licenses add column if not exists ai_monthly_limit integer not null default 0 check (ai_monthly_limit >= 0)`.execute(db)
+  await sql`alter table licenses add column if not exists ai_key_version integer not null default 1`.execute(db)
+
+  await anyDb.schema
+    .createTable('ai_usage')
+    .ifNotExists()
+    .addColumn('id', 'bigserial', (col) => col.primaryKey())
+    .addColumn('license_id', 'text', (col) => col.notNull().references('licenses.id').onDelete('restrict'))
+    .addColumn('feature', 'text', (col) => col.notNull())
+    .addColumn('model', 'text', (col) => col.notNull())
+    .addColumn('input_tokens', 'integer', (col) => col.notNull())
+    .addColumn('output_tokens', 'integer', (col) => col.notNull())
+    .addColumn('cost_micros', 'bigint', (col) => col.notNull())
+    .addColumn('succeeded', 'boolean', (col) => col.notNull())
+    .addColumn('occurred_at', 'bigint', (col) => col.notNull())
+    .execute()
+
+  await anyDb.schema.createIndex('ai_usage_license_idx').ifNotExists().on('ai_usage').columns(['license_id', 'occurred_at']).execute()
+  await anyDb.schema.createIndex('ai_usage_time_idx').ifNotExists().on('ai_usage').column('occurred_at').execute()
 }

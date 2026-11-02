@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/out
+**/release
+.git
+.test-tmp
+.demo-data
+
+# Keys stay off the image: the server gets them from its own environment.
+**/.env
+**/.env.*
+!**/.env.example
+**/*.pem

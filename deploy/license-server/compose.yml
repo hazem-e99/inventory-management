@@ -29,6 +29,10 @@ services:
       PUBLIC_URL: https://${LICENSE_DOMAIN:?set it in .env}
       ADMIN_DIST: /app/admin
       UPDATES_DIR: /updates
+      AI_ENABLED: ${AI_ENABLED:-false}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      AI_INVOICE_MODEL: ${AI_INVOICE_MODEL:-gemini-3.1-flash-lite}
+      AI_DAILY_BUDGET_USD: ${AI_DAILY_BUDGET_USD:-10}
       TRUST_PROXY: 'true'
     volumes:
       - ./updates:/updates:ro

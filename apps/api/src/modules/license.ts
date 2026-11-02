@@ -31,9 +31,17 @@ const OPEN_WHEN_READ_ONLY = [
   /^\/catalog\/export$/,
   /^\/reports\/[^/]+\/export$/,
   /^\/shifts\/[^/]+\/close$/,
+  // Taking consent back must never depend on the license being paid up.
+  /^\/ai\/consent$/,
 ]
 
 const READS = new Set(['GET', 'HEAD', 'OPTIONS'])
+
+interface CheckInAnswer {
+  status?: string
+  token?: string
+  ai?: { enabled: boolean; key?: string; monthlyLimit?: number; used?: number }
+}
 
 /** Anything else would hand a serial and a device id to the network in the clear. */
 function assertSecure(url: string): void {
@@ -76,6 +84,13 @@ function licenseService(deps: AppDeps, config: LicenseConfig) {
     return payload
   }
 
+  /** The owner's consent is their own answer, so the server's news never overwrites it. */
+  async function rememberAi(ai: NonNullable<CheckInAnswer['ai']>): Promise<void> {
+    const now = deps.clock()
+    const { consentedAt } = await settings.ai()
+    await settings.setAi({ enabled: ai.enabled, key: ai.key ?? null, monthlyLimit: ai.monthlyLimit ?? 0, used: ai.used ?? 0, consentedAt }, now)
+  }
+
   return {
     async info(): Promise<LicenseInfo> {
       const { payload, lastSeenAt } = await load()
@@ -111,8 +126,9 @@ function licenseService(deps: AppDeps, config: LicenseConfig) {
       })
       if (!response.ok) return
 
-      const body = (await response.json().catch(() => null)) as { status?: string; token?: string } | null
+      const body = (await response.json().catch(() => null)) as CheckInAnswer | null
       if (body?.status === 'ok' && body.token) await install(body.token)
+      if (body?.ai) await rememberAi(body.ai)
       if (body?.status === 'unbound') await settings.setLicense({ token: null, lastSeenAt: deps.clock() }, deps.clock())
     },
 

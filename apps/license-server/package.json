@@ -8,14 +8,16 @@
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
-    "dev": "tsx src/dev.ts",
-    "build": "esbuild src/index.ts src/create-admin.ts --bundle --platform=node --format=esm --external:@hono/node-server --external:better-auth --external:hono --external:kysely --external:pg --external:zod --outdir=dist --out-extension:.js=.mjs",
+    "dev": "tsx --env-file-if-exists=.env.local src/dev.ts",
+    "build": "esbuild src/index.ts src/create-admin.ts --bundle --platform=node --format=esm --external:@google/genai --external:@hono/node-server --external:better-auth --external:hono --external:kysely --external:pg --external:zod --outdir=dist --out-extension:.js=.mjs",
     "start": "node dist/index.mjs",
     "create-admin": "node dist/create-admin.mjs",
     "generate-keys": "tsx src/generate-keys.ts",
-    "generate-update-key": "tsx src/generate-update-key.ts"
+    "generate-update-key": "tsx src/generate-update-key.ts",
+    "ai-trial": "tsx --env-file-if-exists=.env.local src/ai/trial.ts"
   },
   "dependencies": {
+    "@google/genai": "^2.32.0",
     "@hono/node-server": "^2.1.5",
     "@inv/license-core": "workspace:*",
     "better-auth": "^1.7.15",
